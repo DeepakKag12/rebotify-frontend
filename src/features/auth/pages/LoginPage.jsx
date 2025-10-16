@@ -70,7 +70,7 @@ const LoginPage = () => {
               case "recycler":
                 navigate("/recycler/dashboard");
                 break;
-              case "delivery-partner":
+              case "delivery":
                 navigate("/delivery-partner/dashboard");
                 break;
               default:

@@ -185,7 +185,7 @@ const SignupPage = () => {
               >
                 <option value="user">User</option>
                 <option value="recycler">Recycler</option>
-                <option value="delivery-partner">Delivery Partner</option>
+                <option value="delivery">Delivery Partner</option>
               </select>
             </div>
 

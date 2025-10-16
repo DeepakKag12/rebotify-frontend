@@ -16,7 +16,7 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
         return <Navigate to="/admin/dashboard" replace />;
       case "recycler":
         return <Navigate to="/recycler/dashboard" replace />;
-      case "delivery-partner":
+      case "delivery":
         return <Navigate to="/delivery-partner/dashboard" replace />;
       default:
         return <Navigate to="/user/dashboard" replace />;
