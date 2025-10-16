@@ -175,7 +175,9 @@ const MyListingsPage = () => {
                       View
                     </button>
                     <button
-                      onClick={() => navigate(`/user/listings/${listing._id}/edit`)}
+                      onClick={() =>
+                        navigate(`/user/listings/${listing._id}/edit`)
+                      }
                       className="px-4 py-2 border-2 border-blue-500 text-blue-500 rounded-lg hover:bg-blue-50 transition-colors"
                     >
                       <Edit className="w-4 h-4" />

@@ -28,7 +28,8 @@ const EditListingPage = () => {
     resetListingForm,
   } = useListingStore();
 
-  const { data: listingData, isLoading: isLoadingListing } = useGetListing(listingId);
+  const { data: listingData, isLoading: isLoadingListing } =
+    useGetListing(listingId);
   const { mutate: updateListing, isPending } = useUpdateListing();
 
   const navItems = [
@@ -51,7 +52,7 @@ const EditListingPage = () => {
   useEffect(() => {
     if (listingData?.listing && !isDataLoaded) {
       const listing = listingData.listing;
-      
+
       setListingFormData({
         productCategory: listing.product_category || "",
         brand: listing.brand || "",
@@ -64,7 +65,7 @@ const EditListingPage = () => {
         video_link: listing.video_link || "",
         price: listing.price || "",
         price_type: listing.price_type || "fixed",
-        delivery_options: listing.delivery_options 
+        delivery_options: listing.delivery_options
           ? listing.delivery_options.split(", ").filter(Boolean)
           : [],
         name: listing.name || user?.name || "",
@@ -77,7 +78,7 @@ const EditListingPage = () => {
         images: [],
         aiAnalysisResult: null,
       });
-      
+
       setIsDataLoaded(true);
     }
   }, [listingData, isDataLoaded, setListingFormData, user]);

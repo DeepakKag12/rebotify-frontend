@@ -72,7 +72,8 @@ const Step1UploadImages = ({ isEditMode = false }) => {
       {isEditMode && listingFormData.images.length === 0 && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <p className="text-sm text-blue-700">
-            ℹ️ No new images uploaded. Your existing images will be kept unchanged.
+            ℹ️ No new images uploaded. Your existing images will be kept
+            unchanged.
           </p>
         </div>
       )}

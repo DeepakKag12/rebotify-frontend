@@ -47,11 +47,15 @@ export const listingAPI = {
   },
 
   updateListing: async ({ listingId, formData }) => {
-    const { data } = await axiosInstance.put(`/listings/${listingId}`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    const { data } = await axiosInstance.put(
+      `/listings/${listingId}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
     return data;
   },
 

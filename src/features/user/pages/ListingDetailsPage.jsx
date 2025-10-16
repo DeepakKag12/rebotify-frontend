@@ -412,7 +412,7 @@ const ListingDetailsPage = () => {
                 <Edit className="w-5 h-5" />
                 Edit Listing
               </button>
-              
+
               <button
                 onClick={handleDeleteListing}
                 disabled={isDeleting}
