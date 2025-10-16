@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Leaf, Loader2, CheckCircle2 } from "lucide-react";
+import { Leaf, Loader2, CheckCircle2, Plus, X } from "lucide-react";
 import { toast } from "react-toastify";
 import Input from "../../../components/ui/input";
 import PasswordInput from "../../../components/ui/password-input";
@@ -18,10 +18,12 @@ const SignupPage = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    address: "",
     userType: "user",
     agreeToTerms: false,
   });
+
+  // Separate state for addresses array
+  const [addresses, setAddresses] = useState([{ address: "" }]);
 
   const [errors, setErrors] = useState({});
 
@@ -54,8 +56,10 @@ const SignupPage = () => {
       newErrors.confirmPassword = "Passwords do not match";
     }
 
-    if (!formData.address.trim()) {
-      newErrors.address = "Address is required";
+    // Validate addresses array
+    const hasEmptyAddress = addresses.some((addr) => !addr.address.trim());
+    if (addresses.length === 0 || hasEmptyAddress) {
+      newErrors.addresses = "At least one address is required";
     }
 
     if (!formData.agreeToTerms) {
@@ -78,6 +82,29 @@ const SignupPage = () => {
     }
   };
 
+  // Address management functions
+  const handleAddressChange = (index, value) => {
+    const newAddresses = [...addresses];
+    newAddresses[index].address = value;
+    setAddresses(newAddresses);
+    // Clear error when user types
+    if (errors.addresses) {
+      setErrors((prev) => ({ ...prev, addresses: "" }));
+    }
+  };
+
+  const addAddress = () => {
+    setAddresses([...addresses, { address: "" }]);
+  };
+
+  const removeAddress = (index) => {
+    if (addresses.length > 1) {
+      setAddresses(addresses.filter((_, i) => i !== index));
+    } else {
+      toast.error("At least one address is required");
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -87,7 +114,7 @@ const SignupPage = () => {
       name: formData.name,
       email: formData.email,
       password: formData.password,
-      address: formData.address,
+      addresses: addresses, // Use the addresses array directly
       userType: formData.userType,
     };
 
@@ -161,17 +188,57 @@ const SignupPage = () => {
               autoComplete="email"
             />
 
-            <Input
-              label="Address"
-              type="text"
-              name="address"
-              placeholder="Enter your full address"
-              value={formData.address}
-              onChange={handleChange}
-              error={errors.address}
-              required
-              autoComplete="street-address"
-            />
+            {/* Dynamic Address Fields */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Address(es) <span className="text-red-500 ml-1">*</span>
+              </label>
+              <div className="space-y-3">
+                {addresses.map((addr, index) => (
+                  <div key={index} className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder={`Address ${index + 1}`}
+                      value={addr.address}
+                      onChange={(e) => handleAddressChange(index, e.target.value)}
+                      className="flex h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand-green focus:border-transparent placeholder:text-gray-400"
+                      required
+                    />
+                    {addresses.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeAddress(index)}
+                        className="h-11 w-11 flex items-center justify-center rounded-lg border border-red-300 bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+                        title="Remove address"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+                
+                <button
+                  type="button"
+                  onClick={addAddress}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-brand-green hover:text-white border border-brand-green hover:bg-brand-green rounded-lg transition-colors duration-200"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Another Address
+                </button>
+              </div>
+              {errors.addresses && (
+                <p className="mt-1.5 text-sm text-red-500 flex items-center gap-1">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fillRule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  {errors.addresses}
+                </p>
+              )}
+            </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
