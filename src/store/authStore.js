@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 const useAuthStore = create(
   persist(
@@ -9,12 +9,12 @@ const useAuthStore = create(
       isAuthenticated: false,
 
       setAuth: (user, token) => {
-        localStorage.setItem('token', token);
+        localStorage.setItem("token", token);
         set({ user, token, isAuthenticated: true });
       },
 
       logout: () => {
-        localStorage.removeItem('token');
+        localStorage.removeItem("token");
         set({ user: null, token: null, isAuthenticated: false });
       },
 
@@ -23,8 +23,11 @@ const useAuthStore = create(
       },
     }),
     {
-      name: 'auth-storage',
-      partialize: (state) => ({ user: state.user, isAuthenticated: state.isAuthenticated }),
+      name: "auth-storage",
+      partialize: (state) => ({
+        user: state.user,
+        isAuthenticated: state.isAuthenticated,
+      }),
     }
   )
 );

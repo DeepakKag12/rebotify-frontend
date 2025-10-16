@@ -1,68 +1,68 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { FaBars, FaTimes } from 'react-icons/fa'
-import { motion } from 'framer-motion'
-import useAuthStore from '../../../store/authStore'
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { FaBars, FaTimes } from "react-icons/fa";
+import { motion } from "framer-motion";
+import useAuthStore from "../../../store/authStore";
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false)
-  const navigate = useNavigate()
-  const { isAuthenticated, user } = useAuthStore()
+  const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuthStore();
 
-  const menuItems = ['Home', 'How It Works', 'About Us', 'Services', 'Contact']
+  const menuItems = ["Home", "How It Works", "About Us", "Services", "Contact"];
 
   const scrollToSection = (item) => {
-    const sectionId = item.toLowerCase().replace(/\s+/g, '-')
-    const element = document.getElementById(sectionId)
+    const sectionId = item.toLowerCase().replace(/\s+/g, "-");
+    const element = document.getElementById(sectionId);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' })
+      element.scrollIntoView({ behavior: "smooth" });
     }
-    setIsOpen(false)
-  }
+    setIsOpen(false);
+  };
 
   const handleCreateListing = () => {
     if (isAuthenticated) {
       // Redirect to user's dashboard based on their role
       switch (user?.userType) {
-        case 'admin':
-          navigate('/admin/dashboard')
-          break
-        case 'recycler':
-          navigate('/recycler/dashboard')
-          break
-        case 'delivery-partner':
-          navigate('/delivery-partner/dashboard')
-          break
+        case "admin":
+          navigate("/admin/dashboard");
+          break;
+        case "recycler":
+          navigate("/recycler/dashboard");
+          break;
+        case "delivery-partner":
+          navigate("/delivery-partner/dashboard");
+          break;
         default:
-          navigate('/user/dashboard')
+          navigate("/user/dashboard");
       }
     } else {
-      navigate('/signup')
+      navigate("/signup");
     }
-    setIsOpen(false)
-  }
+    setIsOpen(false);
+  };
 
   const handleSignIn = () => {
     if (isAuthenticated) {
       // Redirect to user's dashboard based on their role
       switch (user?.userType) {
-        case 'admin':
-          navigate('/admin/dashboard')
-          break
-        case 'recycler':
-          navigate('/recycler/dashboard')
-          break
-        case 'delivery-partner':
-          navigate('/delivery-partner/dashboard')
-          break
+        case "admin":
+          navigate("/admin/dashboard");
+          break;
+        case "recycler":
+          navigate("/recycler/dashboard");
+          break;
+        case "delivery-partner":
+          navigate("/delivery-partner/dashboard");
+          break;
         default:
-          navigate('/user/dashboard')
+          navigate("/user/dashboard");
       }
     } else {
-      navigate('/login')
+      navigate("/login");
     }
-    setIsOpen(false)
-  }
+    setIsOpen(false);
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-brand-light shadow-md">
@@ -105,7 +105,7 @@ const Navbar = () => {
               onClick={handleCreateListing}
               className="px-6 py-2 bg-brand-green text-white rounded-lg hover:bg-brand-green-dark transition-all duration-300 font-semibold shadow-md hover:shadow-lg"
             >
-              {isAuthenticated ? 'Dashboard' : 'Get Started'}
+              {isAuthenticated ? "Dashboard" : "Get Started"}
             </motion.button>
             <motion.button
               initial={{ opacity: 0, x: 20 }}
@@ -114,7 +114,7 @@ const Navbar = () => {
               onClick={handleSignIn}
               className="px-6 py-2 border-2 border-brand-olive text-brand-olive rounded-lg hover:bg-brand-olive hover:text-white transition-all duration-300 font-semibold"
             >
-              {isAuthenticated ? 'My Account' : 'Sign In'}
+              {isAuthenticated ? "My Account" : "Sign In"}
             </motion.button>
           </div>
 
@@ -134,7 +134,7 @@ const Navbar = () => {
       {isOpen && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
+          animate={{ opacity: 1, height: "auto" }}
           exit={{ opacity: 0, height: 0 }}
           className="md:hidden bg-white border-t border-brand-light-dark"
         >
@@ -149,24 +149,24 @@ const Navbar = () => {
               </button>
             ))}
             <div className="pt-4 space-y-2">
-              <button 
+              <button
                 onClick={handleCreateListing}
                 className="w-full px-6 py-2 bg-brand-green text-white rounded-lg hover:bg-brand-green-dark transition-all duration-300 font-semibold"
               >
-                {isAuthenticated ? 'Dashboard' : 'Get Started'}
+                {isAuthenticated ? "Dashboard" : "Get Started"}
               </button>
-              <button 
+              <button
                 onClick={handleSignIn}
                 className="w-full px-6 py-2 border-2 border-brand-olive text-brand-olive rounded-lg hover:bg-brand-olive hover:text-white transition-all duration-300 font-semibold"
               >
-                {isAuthenticated ? 'My Account' : 'Sign In'}
+                {isAuthenticated ? "My Account" : "Sign In"}
               </button>
             </div>
           </div>
         </motion.div>
       )}
     </nav>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;

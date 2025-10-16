@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Leaf, User, LogOut, ChevronDown } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import useAuthStore from '../../store/authStore';
-import { useLogout } from '../../services/authService';
-import { toast } from 'react-toastify';
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { Leaf, User, LogOut, ChevronDown } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import useAuthStore from "../../store/authStore";
+import { useLogout } from "../../services/authService";
+import { toast } from "react-toastify";
 
 const DashboardNavbar = ({ navItems = [] }) => {
   const { user } = useAuthStore();
@@ -14,8 +14,8 @@ const DashboardNavbar = ({ navItems = [] }) => {
   const handleLogout = () => {
     logout(undefined, {
       onSuccess: () => {
-        toast.success('Logged out successfully');
-        window.location.href = '/login';
+        toast.success("Logged out successfully");
+        window.location.href = "/login";
       },
     });
   };
@@ -55,12 +55,16 @@ const DashboardNavbar = ({ navItems = [] }) => {
                 <User className="w-5 h-5 text-brand-green" />
               </div>
               <div className="text-left hidden sm:block">
-                <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-                <p className="text-xs text-gray-500 capitalize">{user?.userType}</p>
+                <p className="text-sm font-medium text-gray-900">
+                  {user?.name}
+                </p>
+                <p className="text-xs text-gray-500 capitalize">
+                  {user?.userType}
+                </p>
               </div>
               <ChevronDown
                 className={`w-4 h-4 text-gray-500 transition-transform ${
-                  isDropdownOpen ? 'rotate-180' : ''
+                  isDropdownOpen ? "rotate-180" : ""
                 }`}
               />
             </button>
@@ -73,7 +77,7 @@ const DashboardNavbar = ({ navItems = [] }) => {
                     className="fixed inset-0 z-40"
                     onClick={() => setIsDropdownOpen(false)}
                   />
-                  
+
                   {/* Dropdown */}
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
@@ -83,7 +87,9 @@ const DashboardNavbar = ({ navItems = [] }) => {
                     className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden z-50"
                   >
                     <div className="p-3 border-b border-gray-200">
-                      <p className="text-sm font-medium text-gray-900">{user?.name}</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        {user?.name}
+                      </p>
                       <p className="text-xs text-gray-500">{user?.email}</p>
                     </div>
                     <div className="py-2">

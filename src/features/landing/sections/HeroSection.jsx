@@ -1,41 +1,44 @@
-import { motion } from 'framer-motion'
-import { useNavigate } from 'react-router-dom'
-import { FaRecycle, FaLeaf, FaCheckCircle } from 'react-icons/fa'
-import useAuthStore from '../../../store/authStore'
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { FaRecycle, FaLeaf, FaCheckCircle } from "react-icons/fa";
+import useAuthStore from "../../../store/authStore";
 
 const HeroSection = () => {
-  const navigate = useNavigate()
-  const { isAuthenticated, user } = useAuthStore()
+  const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuthStore();
 
   const handleGetStarted = () => {
     if (isAuthenticated) {
       switch (user?.userType) {
-        case 'admin':
-          navigate('/admin/dashboard')
-          break
-        case 'recycler':
-          navigate('/recycler/dashboard')
-          break
-        case 'delivery-partner':
-          navigate('/delivery-partner/dashboard')
-          break
+        case "admin":
+          navigate("/admin/dashboard");
+          break;
+        case "recycler":
+          navigate("/recycler/dashboard");
+          break;
+        case "delivery-partner":
+          navigate("/delivery-partner/dashboard");
+          break;
         default:
-          navigate('/user/dashboard')
+          navigate("/user/dashboard");
       }
     } else {
-      navigate('/signup')
+      navigate("/signup");
     }
-  }
+  };
 
   const handleLearnMore = () => {
-    const element = document.getElementById('how-it-works')
+    const element = document.getElementById("how-it-works");
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' })
+      element.scrollIntoView({ behavior: "smooth" });
     }
-  }
+  };
 
   return (
-    <section id="home" className="pt-24 pb-16 bg-gradient-to-br from-brand-light via-white to-brand-light min-h-screen flex items-center">
+    <section
+      id="home"
+      className="pt-24 pb-16 bg-gradient-to-br from-brand-light via-white to-brand-light min-h-screen flex items-center"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
@@ -54,8 +57,9 @@ const HeroSection = () => {
             </h1>
 
             <p className="text-xl text-brand-gray-medium leading-relaxed">
-              Connect with certified recyclers and make a positive impact on the environment. 
-              Safely dispose of your electronic waste in just a few clicks.
+              Connect with certified recyclers and make a positive impact on the
+              environment. Safely dispose of your electronic waste in just a few
+              clicks.
             </p>
 
             {/* CTA Buttons */}
@@ -66,7 +70,7 @@ const HeroSection = () => {
                 onClick={handleGetStarted}
                 className="px-8 py-4 bg-brand-green text-white rounded-lg hover:bg-brand-green-dark transition-all duration-300 font-semibold text-lg shadow-xl hover:shadow-2xl"
               >
-                {isAuthenticated ? 'Go to Dashboard' : 'Get Started'}
+                {isAuthenticated ? "Go to Dashboard" : "Get Started"}
               </motion.button>
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -87,7 +91,9 @@ const HeroSection = () => {
                 className="text-center"
               >
                 <div className="text-3xl font-bold text-brand-green">50K+</div>
-                <div className="text-sm text-brand-gray-medium">Items Recycled</div>
+                <div className="text-sm text-brand-gray-medium">
+                  Items Recycled
+                </div>
               </motion.div>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -96,7 +102,9 @@ const HeroSection = () => {
                 className="text-center"
               >
                 <div className="text-3xl font-bold text-brand-green">10K+</div>
-                <div className="text-sm text-brand-gray-medium">Happy Users</div>
+                <div className="text-sm text-brand-gray-medium">
+                  Happy Users
+                </div>
               </motion.div>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -121,7 +129,7 @@ const HeroSection = () => {
               <div className="absolute top-6 right-6 bg-white rounded-full p-4 shadow-lg">
                 <FaLeaf className="text-4xl text-brand-green" />
               </div>
-              
+
               <div className="space-y-8 text-white">
                 <div className="flex items-center space-x-4">
                   <div className="bg-white/20 rounded-full p-4">
@@ -145,8 +153,8 @@ const HeroSection = () => {
 
                 <div className="bg-white/10 rounded-2xl p-6 backdrop-blur-sm">
                   <p className="text-lg italic">
-                    "Join thousands of users making a difference. Your old electronics 
-                    can have a new purpose."
+                    "Join thousands of users making a difference. Your old
+                    electronics can have a new purpose."
                   </p>
                 </div>
               </div>
@@ -159,7 +167,7 @@ const HeroSection = () => {
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default HeroSection
+export default HeroSection;

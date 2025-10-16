@@ -1,25 +1,25 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Leaf, Loader2, CheckCircle2 } from 'lucide-react';
-import { toast } from 'react-toastify';
-import Input from '../../../components/ui/input';
-import PasswordInput from '../../../components/ui/password-input';
-import Checkbox from '../../../components/ui/checkbox';
-import { Button } from '../../../components/ui/button';
-import { useSignup } from '../../../services/authService';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Leaf, Loader2, CheckCircle2 } from "lucide-react";
+import { toast } from "react-toastify";
+import Input from "../../../components/ui/input";
+import PasswordInput from "../../../components/ui/password-input";
+import Checkbox from "../../../components/ui/checkbox";
+import { Button } from "../../../components/ui/button";
+import { useSignup } from "../../../services/authService";
 
 const SignupPage = () => {
   const navigate = useNavigate();
   const { mutate: signup, isPending } = useSignup();
 
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    address: '',
-    userType: 'user',
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    address: "",
+    userType: "user",
     agreeToTerms: false,
   });
 
@@ -29,15 +29,15 @@ const SignupPage = () => {
     const newErrors = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = 'Full name is required';
+      newErrors.name = "Full name is required";
     } else if (formData.name.trim().length < 2) {
-      newErrors.name = 'Name must be at least 2 characters';
+      newErrors.name = "Name must be at least 2 characters";
     }
 
     if (!formData.email) {
-      newErrors.email = 'Email is required';
+      newErrors.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email';
+      newErrors.email = "Please enter a valid email";
     }
 
     // if (!formData.password) {
@@ -49,17 +49,17 @@ const SignupPage = () => {
     // }
 
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password';
+      newErrors.confirmPassword = "Please confirm your password";
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
+      newErrors.confirmPassword = "Passwords do not match";
     }
 
     if (!formData.address.trim()) {
-      newErrors.address = 'Address is required';
+      newErrors.address = "Address is required";
     }
 
     if (!formData.agreeToTerms) {
-      newErrors.agreeToTerms = 'You must agree to the terms and conditions';
+      newErrors.agreeToTerms = "You must agree to the terms and conditions";
     }
 
     setErrors(newErrors);
@@ -70,11 +70,11 @@ const SignupPage = () => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: type === "checkbox" ? checked : value,
     }));
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: '' }));
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
 
@@ -93,13 +93,17 @@ const SignupPage = () => {
 
     signup(signupData, {
       onSuccess: (data) => {
-        toast.success('Account created successfully! Please login to continue.');
+        toast.success(
+          "Account created successfully! Please login to continue."
+        );
         setTimeout(() => {
-          navigate('/login');
+          navigate("/login");
         }, 1500);
       },
       onError: (error) => {
-        toast.error(error.response?.data?.message || 'Signup failed. Please try again.');
+        toast.error(
+          error.response?.data?.message || "Signup failed. Please try again."
+        );
       },
     });
   };
@@ -124,7 +128,9 @@ const SignupPage = () => {
 
           {/* Header */}
           <div className="mb-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Create Account
+            </h1>
             <p className="text-gray-600">Join us in making a greener future</p>
           </div>
 
@@ -214,8 +220,11 @@ const SignupPage = () => {
               error={errors.agreeToTerms}
               label={
                 <span>
-                  I agree to the{' '}
-                  <Link to="/terms" className="text-brand-green hover:text-brand-green-dark">
+                  I agree to the{" "}
+                  <Link
+                    to="/terms"
+                    className="text-brand-green hover:text-brand-green-dark"
+                  >
                     Terms & Conditions
                   </Link>
                 </span>
@@ -233,7 +242,7 @@ const SignupPage = () => {
                   Creating Account...
                 </>
               ) : (
-                'Create Account'
+                "Create Account"
               )}
             </Button>
 
@@ -255,7 +264,7 @@ const SignupPage = () => {
 
           {/* Login Link */}
           <p className="mt-6 text-center text-sm text-gray-600">
-            Already have an account?{' '}
+            Already have an account?{" "}
             <Link
               to="/login"
               className="font-medium text-brand-green hover:text-brand-green-dark transition-colors"
@@ -280,17 +289,17 @@ const SignupPage = () => {
             </div>
             <h2 className="text-4xl font-bold mb-4">Join Our Community</h2>
             <p className="text-lg text-white/90 leading-relaxed">
-              Be part of the solution. Create an account today and start your journey towards
-              sustainable e-waste management.
+              Be part of the solution. Create an account today and start your
+              journey towards sustainable e-waste management.
             </p>
           </div>
 
           <div className="space-y-4">
             {[
-              'Quick and easy registration',
-              'Secure account protection',
-              'Access to all features',
-              'Join thousands of users',
+              "Quick and easy registration",
+              "Secure account protection",
+              "Access to all features",
+              "Join thousands of users",
             ].map((feature, index) => (
               <motion.div
                 key={index}

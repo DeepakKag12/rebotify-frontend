@@ -1,14 +1,18 @@
-import React, { useState } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import React, { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
+import { cn } from "../../lib/utils";
 
 const PasswordInput = React.forwardRef(
   ({ className, error, label, showStrengthIndicator, ...props }, ref) => {
     const [showPassword, setShowPassword] = useState(false);
-    const [strength, setStrength] = useState({ score: 0, label: '', color: '' });
+    const [strength, setStrength] = useState({
+      score: 0,
+      label: "",
+      color: "",
+    });
 
     const calculateStrength = (password) => {
-      if (!password) return { score: 0, label: '', color: '' };
+      if (!password) return { score: 0, label: "", color: "" };
 
       let score = 0;
       if (password.length >= 8) score++;
@@ -17,9 +21,9 @@ const PasswordInput = React.forwardRef(
       if (/\d/.test(password)) score++;
       if (/[^a-zA-Z0-9]/.test(password)) score++;
 
-      if (score <= 2) return { score, label: 'Weak', color: 'bg-red-500' };
-      if (score <= 3) return { score, label: 'Medium', color: 'bg-yellow-500' };
-      return { score, label: 'Strong', color: 'bg-brand-green' };
+      if (score <= 2) return { score, label: "Weak", color: "bg-red-500" };
+      if (score <= 3) return { score, label: "Medium", color: "bg-yellow-500" };
+      return { score, label: "Strong", color: "bg-brand-green" };
     };
 
     const handlePasswordChange = (e) => {
@@ -41,14 +45,14 @@ const PasswordInput = React.forwardRef(
         )}
         <div className="relative">
           <input
-            type={showPassword ? 'text' : 'password'}
+            type={showPassword ? "text" : "password"}
             className={cn(
-              'flex h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2 pr-12 text-sm',
-              'transition-all duration-200',
-              'focus:outline-none focus:ring-2 focus:ring-brand-green focus:border-transparent',
-              'placeholder:text-gray-400',
-              'disabled:cursor-not-allowed disabled:opacity-50',
-              error && 'border-red-500 focus:ring-red-500',
+              "flex h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2 pr-12 text-sm",
+              "transition-all duration-200",
+              "focus:outline-none focus:ring-2 focus:ring-brand-green focus:border-transparent",
+              "placeholder:text-gray-400",
+              "disabled:cursor-not-allowed disabled:opacity-50",
+              error && "border-red-500 focus:ring-red-500",
               className
             )}
             ref={ref}
@@ -60,7 +64,11 @@ const PasswordInput = React.forwardRef(
             onClick={() => setShowPassword(!showPassword)}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
           >
-            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+            {showPassword ? (
+              <EyeOff className="w-5 h-5" />
+            ) : (
+              <Eye className="w-5 h-5" />
+            )}
           </button>
         </div>
 
@@ -71,13 +79,15 @@ const PasswordInput = React.forwardRef(
                 <div
                   key={i}
                   className={cn(
-                    'h-1 flex-1 rounded-full transition-all duration-300',
-                    i < strength.score ? strength.color : 'bg-gray-200'
+                    "h-1 flex-1 rounded-full transition-all duration-300",
+                    i < strength.score ? strength.color : "bg-gray-200"
                   )}
                 />
               ))}
             </div>
-            <p className={cn('text-xs', strength.color.replace('bg-', 'text-'))}>
+            <p
+              className={cn("text-xs", strength.color.replace("bg-", "text-"))}
+            >
               Password strength: {strength.label}
             </p>
           </div>
@@ -106,6 +116,6 @@ const PasswordInput = React.forwardRef(
   }
 );
 
-PasswordInput.displayName = 'PasswordInput';
+PasswordInput.displayName = "PasswordInput";
 
 export default PasswordInput;

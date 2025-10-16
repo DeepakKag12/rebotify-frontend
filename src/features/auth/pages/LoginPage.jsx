@@ -1,21 +1,21 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Leaf, Loader2 } from 'lucide-react';
-import { toast } from 'react-toastify';
-import Input from '../../../components/ui/input';
-import PasswordInput from '../../../components/ui/password-input';
-import Checkbox from '../../../components/ui/checkbox';
-import { Button } from '../../../components/ui/button';
-import { useLogin } from '../../../services/authService';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Leaf, Loader2 } from "lucide-react";
+import { toast } from "react-toastify";
+import Input from "../../../components/ui/input";
+import PasswordInput from "../../../components/ui/password-input";
+import Checkbox from "../../../components/ui/checkbox";
+import { Button } from "../../../components/ui/button";
+import { useLogin } from "../../../services/authService";
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const { mutate: login, isPending } = useLogin();
 
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
     rememberMe: false,
   });
 
@@ -25,13 +25,13 @@ const LoginPage = () => {
     const newErrors = {};
 
     if (!formData.email) {
-      newErrors.email = 'Email is required';
+      newErrors.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email';
+      newErrors.email = "Please enter a valid email";
     }
 
     if (!formData.password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = "Password is required";
     }
 
     setErrors(newErrors);
@@ -42,11 +42,11 @@ const LoginPage = () => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: type === "checkbox" ? checked : value,
     }));
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: '' }));
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
 
@@ -59,27 +59,29 @@ const LoginPage = () => {
       { email: formData.email, password: formData.password },
       {
         onSuccess: (data) => {
-          toast.success('Login successful! Redirecting...');
-          
+          toast.success("Login successful! Redirecting...");
+
           // Redirect based on user type
           setTimeout(() => {
             switch (data.user.userType) {
-              case 'admin':
-                navigate('/admin/dashboard');
+              case "admin":
+                navigate("/admin/dashboard");
                 break;
-              case 'recycler':
-                navigate('/recycler/dashboard');
+              case "recycler":
+                navigate("/recycler/dashboard");
                 break;
-              case 'delivery-partner':
-                navigate('/delivery-partner/dashboard');
+              case "delivery-partner":
+                navigate("/delivery-partner/dashboard");
                 break;
               default:
-                navigate('/user/dashboard');
+                navigate("/user/dashboard");
             }
           }, 1000);
         },
         onError: (error) => {
-          toast.error(error.response?.data?.message || 'Login failed. Please try again.');
+          toast.error(
+            error.response?.data?.message || "Login failed. Please try again."
+          );
         },
       }
     );
@@ -105,8 +107,12 @@ const LoginPage = () => {
 
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
-            <p className="text-gray-600">Sign in to continue to your dashboard</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Welcome Back
+            </h1>
+            <p className="text-gray-600">
+              Sign in to continue to your dashboard
+            </p>
           </div>
 
           {/* Form */}
@@ -162,7 +168,7 @@ const LoginPage = () => {
                   Signing in...
                 </>
               ) : (
-                'Sign In'
+                "Sign In"
               )}
             </Button>
 
@@ -184,7 +190,7 @@ const LoginPage = () => {
 
           {/* Sign Up Link */}
           <p className="mt-8 text-center text-sm text-gray-600">
-            Don't have an account?{' '}
+            Don't have an account?{" "}
             <Link
               to="/signup"
               className="font-medium text-brand-green hover:text-brand-green-dark transition-colors"
@@ -209,17 +215,17 @@ const LoginPage = () => {
             </div>
             <h2 className="text-4xl font-bold mb-4">Welcome to Rebot</h2>
             <p className="text-lg text-white/90 leading-relaxed">
-              Join the movement towards a sustainable future. Manage your e-waste responsibly and
-              contribute to a greener planet.
+              Join the movement towards a sustainable future. Manage your
+              e-waste responsibly and contribute to a greener planet.
             </p>
           </div>
 
           <div className="space-y-4">
             {[
-              'Track your e-waste disposal',
-              'Connect with certified recyclers',
-              'Earn rewards for responsible recycling',
-              'Make a positive environmental impact',
+              "Track your e-waste disposal",
+              "Connect with certified recyclers",
+              "Earn rewards for responsible recycling",
+              "Make a positive environmental impact",
             ].map((feature, index) => (
               <motion.div
                 key={index}

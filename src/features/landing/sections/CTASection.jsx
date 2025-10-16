@@ -1,38 +1,38 @@
-import { motion } from 'framer-motion'
-import { useNavigate } from 'react-router-dom'
-import { FaArrowRight } from 'react-icons/fa'
-import useAuthStore from '../../../store/authStore'
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { FaArrowRight } from "react-icons/fa";
+import useAuthStore from "../../../store/authStore";
 
 const CTASection = () => {
-  const navigate = useNavigate()
-  const { isAuthenticated, user } = useAuthStore()
+  const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuthStore();
 
   const handleCreateListing = () => {
     if (isAuthenticated) {
       switch (user?.userType) {
-        case 'admin':
-          navigate('/admin/dashboard')
-          break
-        case 'recycler':
-          navigate('/recycler/dashboard')
-          break
-        case 'delivery-partner':
-          navigate('/delivery-partner/dashboard')
-          break
+        case "admin":
+          navigate("/admin/dashboard");
+          break;
+        case "recycler":
+          navigate("/recycler/dashboard");
+          break;
+        case "delivery-partner":
+          navigate("/delivery-partner/dashboard");
+          break;
         default:
-          navigate('/user/dashboard')
+          navigate("/user/dashboard");
       }
     } else {
-      navigate('/signup')
+      navigate("/signup");
     }
-  }
+  };
 
   const handleLearnMore = () => {
-    const element = document.getElementById('how-it-works')
+    const element = document.getElementById("how-it-works");
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' })
+      element.scrollIntoView({ behavior: "smooth" });
     }
-  }
+  };
 
   return (
     <section className="py-20 bg-gradient-to-r from-brand-green to-brand-olive relative overflow-hidden">
@@ -46,7 +46,7 @@ const CTASection = () => {
           transition={{
             duration: 20,
             repeat: Infinity,
-            ease: 'linear',
+            ease: "linear",
           }}
           className="absolute top-10 left-10 w-64 h-64 bg-white rounded-full blur-3xl"
         ></motion.div>
@@ -58,7 +58,7 @@ const CTASection = () => {
           transition={{
             duration: 15,
             repeat: Infinity,
-            ease: 'linear',
+            ease: "linear",
           }}
           className="absolute bottom-10 right-10 w-80 h-80 bg-white rounded-full blur-3xl"
         ></motion.div>
@@ -74,9 +74,9 @@ const CTASection = () => {
           <h2 className="text-4xl md:text-6xl font-bold text-white leading-tight">
             Ready to Make a Difference?
           </h2>
-          
+
           <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto">
-            Join thousands of users contributing to a cleaner, greener planet. 
+            Join thousands of users contributing to a cleaner, greener planet.
             Start your e-waste recycling journey today!
           </p>
 
@@ -87,10 +87,12 @@ const CTASection = () => {
               onClick={handleCreateListing}
               className="px-10 py-5 bg-white text-brand-green rounded-lg hover:bg-brand-light transition-all duration-300 font-bold text-lg shadow-2xl flex items-center gap-3 group"
             >
-              {isAuthenticated ? 'Go to Dashboard' : 'Create Your First Listing'}
+              {isAuthenticated
+                ? "Go to Dashboard"
+                : "Create Your First Listing"}
               <FaArrowRight className="group-hover:translate-x-2 transition-transform" />
             </motion.button>
-            
+
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -103,13 +105,14 @@ const CTASection = () => {
 
           <div className="pt-8 text-white/80">
             <p className="text-sm">
-              ✓ Free listing • ✓ Certified recyclers • ✓ Quick pickup • ✓ Real-time tracking
+              ✓ Free listing • ✓ Certified recyclers • ✓ Quick pickup • ✓
+              Real-time tracking
             </p>
           </div>
         </motion.div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default CTASection
+export default CTASection;

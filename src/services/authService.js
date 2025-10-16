@@ -1,22 +1,22 @@
-import axiosInstance from '../lib/axios';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { queryClient } from '../lib/queryClient';
-import useAuthStore from '../store/authStore';
+import axiosInstance from "../lib/axios";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { queryClient } from "../lib/queryClient";
+import useAuthStore from "../store/authStore";
 
 // API Calls
 export const authAPI = {
   signup: async (userData) => {
-    const { data } = await axiosInstance.post('/users/signup', userData);
+    const { data } = await axiosInstance.post("/users/signup", userData);
     return data;
   },
 
   login: async (credentials) => {
-    const { data } = await axiosInstance.post('/users/login', credentials);
+    const { data } = await axiosInstance.post("/users/login", credentials);
     return data;
   },
 
   logout: async () => {
-    const { data } = await axiosInstance.post('/users/logout');
+    const { data } = await axiosInstance.post("/users/logout");
     return data;
   },
 
@@ -26,7 +26,10 @@ export const authAPI = {
   },
 
   updateProfile: async ({ userId, userData }) => {
-    const { data } = await axiosInstance.put(`/users/profile/${userId}`, userData);
+    const { data } = await axiosInstance.put(
+      `/users/profile/${userId}`,
+      userData
+    );
     return data;
   },
 };
@@ -51,7 +54,7 @@ export const useLogin = () => {
     mutationFn: authAPI.login,
     onSuccess: (data) => {
       // Backend sets httpOnly cookie, but we'll also store in localStorage for client-side checks
-      setAuth(data.user, data.token || 'cookie-based');
+      setAuth(data.user, data.token || "cookie-based");
     },
   });
 };
@@ -70,7 +73,7 @@ export const useLogout = () => {
 
 export const useProfile = (userId) => {
   return useQuery({
-    queryKey: ['profile', userId],
+    queryKey: ["profile", userId],
     queryFn: () => authAPI.getProfile(userId),
     enabled: !!userId,
   });
@@ -80,7 +83,9 @@ export const useUpdateProfile = () => {
   return useMutation({
     mutationFn: authAPI.updateProfile,
     onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['profile', variables.userId] });
+      queryClient.invalidateQueries({
+        queryKey: ["profile", variables.userId],
+      });
     },
   });
 };

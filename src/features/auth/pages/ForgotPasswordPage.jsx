@@ -1,24 +1,24 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Leaf, Loader2, ArrowLeft, Mail } from 'lucide-react';
-import { toast } from 'react-toastify';
-import Input from '../../../components/ui/input';
-import { Button } from '../../../components/ui/button';
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Leaf, Loader2, ArrowLeft, Mail } from "lucide-react";
+import { toast } from "react-toastify";
+import Input from "../../../components/ui/input";
+import { Button } from "../../../components/ui/button";
 
 const ForgotPasswordPage = () => {
-  const [email, setEmail] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const validateEmail = () => {
     if (!email) {
-      setError('Email is required');
+      setError("Email is required");
       return false;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError('Please enter a valid email');
+      setError("Please enter a valid email");
       return false;
     }
     return true;
@@ -26,23 +26,23 @@ const ForgotPasswordPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateEmail()) return;
 
     setIsLoading(true);
-    
+
     // Simulate API call (implement actual forgot password API later)
     setTimeout(() => {
       setIsLoading(false);
       setIsSubmitted(true);
-      toast.success('Password reset link sent to your email!');
+      toast.success("Password reset link sent to your email!");
     }, 1500);
   };
 
   const handleChange = (e) => {
     setEmail(e.target.value);
     if (error) {
-      setError('');
+      setError("");
     }
   };
 
@@ -58,10 +58,12 @@ const ForgotPasswordPage = () => {
           <div className="w-16 h-16 bg-brand-green/10 rounded-full flex items-center justify-center mx-auto mb-6">
             <Mail className="w-8 h-8 text-brand-green" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-3">Check Your Email</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-3">
+            Check Your Email
+          </h2>
           <p className="text-gray-600 mb-6">
-            We've sent a password reset link to <strong>{email}</strong>. Please check your inbox
-            and follow the instructions.
+            We've sent a password reset link to <strong>{email}</strong>. Please
+            check your inbox and follow the instructions.
           </p>
           <div className="space-y-3">
             <Link to="/login">
@@ -72,7 +74,7 @@ const ForgotPasswordPage = () => {
             <button
               onClick={() => {
                 setIsSubmitted(false);
-                setEmail('');
+                setEmail("");
               }}
               className="w-full text-sm text-gray-600 hover:text-gray-900 transition-colors"
             >
@@ -102,9 +104,12 @@ const ForgotPasswordPage = () => {
 
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Forgot Password?</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Forgot Password?
+          </h1>
           <p className="text-gray-600">
-            No worries! Enter your email address and we'll send you a link to reset your password.
+            No worries! Enter your email address and we'll send you a link to
+            reset your password.
           </p>
         </div>
 
@@ -134,7 +139,7 @@ const ForgotPasswordPage = () => {
                 Sending...
               </>
             ) : (
-              'Send Reset Link'
+              "Send Reset Link"
             )}
           </Button>
 

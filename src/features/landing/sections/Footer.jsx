@@ -1,33 +1,41 @@
-import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn, FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa'
-import { Link } from 'react-router-dom'
+import {
+  FaFacebookF,
+  FaTwitter,
+  FaInstagram,
+  FaLinkedinIn,
+  FaEnvelope,
+  FaPhone,
+  FaMapMarkerAlt,
+} from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   const quickLinks = [
-    { name: 'About Us', href: '#about-us' },
-    { name: 'How It Works', href: '#how-it-works' },
-    { name: 'Services', href: '#services' },
-    { name: 'Contact', href: '#contact' },
-  ]
+    { name: "About Us", href: "#about-us" },
+    { name: "How It Works", href: "#how-it-works" },
+    { name: "Services", href: "#services" },
+    { name: "Contact", href: "#contact" },
+  ];
 
   const legalLinks = [
-    { name: 'Privacy Policy', href: '/privacy' },
-    { name: 'Terms & Conditions', href: '/terms' },
-    { name: 'Cookie Policy', href: '/cookies' },
-    { name: 'FAQ', href: '/faq' },
-  ]
+    { name: "Privacy Policy", href: "/privacy" },
+    { name: "Terms & Conditions", href: "/terms" },
+    { name: "Cookie Policy", href: "/cookies" },
+    { name: "FAQ", href: "/faq" },
+  ];
 
   const accountLinks = [
-    { name: 'Sign Up', href: '/signup' },
-    { name: 'Sign In', href: '/login' },
-    { name: 'Forgot Password', href: '/forgot-password' },
-  ]
+    { name: "Sign Up", href: "/signup" },
+    { name: "Sign In", href: "/login" },
+    { name: "Forgot Password", href: "/forgot-password" },
+  ];
 
   const socialLinks = [
-    { icon: FaFacebookF, href: '#', label: 'Facebook' },
-    { icon: FaTwitter, href: '#', label: 'Twitter' },
-    { icon: FaInstagram, href: '#', label: 'Instagram' },
-    { icon: FaLinkedinIn, href: '#', label: 'LinkedIn' },
-  ]
+    { icon: FaFacebookF, href: "#", label: "Facebook" },
+    { icon: FaTwitter, href: "#", label: "Twitter" },
+    { icon: FaInstagram, href: "#", label: "Instagram" },
+    { icon: FaLinkedinIn, href: "#", label: "LinkedIn" },
+  ];
 
   return (
     <footer id="contact" className="bg-brand-olive text-white">
@@ -41,7 +49,8 @@ const Footer = () => {
               </h3>
             </Link>
             <p className="text-white/80 mb-4 leading-relaxed">
-              Making e-waste recycling simple, secure, and sustainable for everyone.
+              Making e-waste recycling simple, secure, and sustainable for
+              everyone.
             </p>
             <div className="flex space-x-4">
               {socialLinks.map((social, index) => (
@@ -139,7 +148,9 @@ const Footer = () => {
         {/* Newsletter */}
         <div className="border-t border-white/20 pt-8 mb-8">
           <div className="max-w-2xl mx-auto text-center">
-            <h4 className="text-xl font-bold mb-4">Subscribe to Our Newsletter</h4>
+            <h4 className="text-xl font-bold mb-4">
+              Subscribe to Our Newsletter
+            </h4>
             <p className="text-white/80 mb-4">
               Get updates on e-waste recycling tips and environmental news
             </p>
@@ -161,12 +172,13 @@ const Footer = () => {
           <p>
             © {new Date().getFullYear()} E-WasteHub. All rights reserved.
             <span className="mx-2">|</span>
-            Made with <span className="text-brand-green-light">♥</span> for the Planet
+            Made with <span className="text-brand-green-light">♥</span> for the
+            Planet
           </p>
         </div>
       </div>
     </footer>
-  )
-}
+  );
+};
 
-export default Footer
+export default Footer;
