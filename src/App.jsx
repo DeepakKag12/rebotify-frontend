@@ -14,6 +14,12 @@ import RecyclerDashboard from "./features/recycler/pages/RecyclerDashboard";
 import DeliveryPartnerDashboard from "./features/delivery-partner/pages/DeliveryPartnerDashboard";
 import AdminDashboard from "./features/admin/pages/AdminDashboard";
 
+// User Pages
+import CreateListingPage from "./features/user/pages/CreateListingPage";
+import MyListingsPage from "./features/user/pages/MyListingsPage";
+import ListingDetailsPage from "./features/user/pages/ListingDetailsPage";
+import EditListingPage from "./features/user/pages/EditListingPage";
+
 // Components
 import ProtectedRoute from "./components/ProtectedRoute";
 import useAuthStore from "./store/authStore";
@@ -53,6 +59,38 @@ function App() {
         element={
           <ProtectedRoute allowedRoles={["user"]}>
             <UserDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/user/create-listing"
+        element={
+          <ProtectedRoute allowedRoles={["user"]}>
+            <CreateListingPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/user/listings"
+        element={
+          <ProtectedRoute allowedRoles={["user"]}>
+            <MyListingsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/user/listings/:listingId"
+        element={
+          <ProtectedRoute allowedRoles={["user"]}>
+            <ListingDetailsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/user/listings/:listingId/edit"
+        element={
+          <ProtectedRoute allowedRoles={["user"]}>
+            <EditListingPage />
           </ProtectedRoute>
         }
       />

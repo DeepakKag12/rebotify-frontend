@@ -1,42 +1,95 @@
 import { motion } from "framer-motion";
-import { Package, TrendingUp, Award, MapPin } from "lucide-react";
+import {
+  Package,
+  TrendingUp,
+  Award,
+  MapPin,
+  Plus,
+  FileText,
+  History,
+  Settings,
+  Recycle,
+  ShoppingBag,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import DashboardNavbar from "../../../shared/components/DashboardNavbar";
 import useAuthStore from "../../../store/authStore";
+import { useGetSellerListings } from "../../../services/listingService";
 
 const UserDashboard = () => {
   const { user } = useAuthStore();
+  const navigate = useNavigate();
+
+  // Fetch user's listings
+  const { data: listingsData } = useGetSellerListings(1, 10);
 
   const navItems = [
     { label: "Dashboard", path: "/user/dashboard" },
+    { label: "Create Listing", path: "/user/create-listing" },
     { label: "My Listings", path: "/user/listings" },
-    { label: "Bids", path: "/user/bids" },
-    { label: "Messages", path: "/user/messages" },
   ];
 
   const stats = [
     {
       icon: Package,
       label: "Total Listings",
-      value: "0",
+      value: listingsData?.totalListings || "0",
       color: "bg-blue-500",
     },
     {
       icon: TrendingUp,
-      label: "Active Bids",
-      value: "0",
+      label: "Active Listings",
+      value:
+        listingsData?.listings?.filter((l) => l.status === "open").length ||
+        "0",
       color: "bg-brand-green",
     },
     {
       icon: Award,
-      label: "Completed",
+      label: "Completed Deals",
       value: "0",
       color: "bg-purple-500",
     },
     {
-      icon: MapPin,
-      label: "Near You",
+      icon: ShoppingBag,
+      label: "Total Bids",
       value: "0",
       color: "bg-orange-500",
+    },
+  ];
+
+  const quickActions = [
+    {
+      icon: Plus,
+      title: "Create New Listing",
+      description: "Sell your e-waste items easily",
+      color: "bg-brand-green",
+      hoverColor: "hover:bg-brand-green/90",
+      path: "/user/create-listing",
+    },
+    {
+      icon: FileText,
+      title: "Browse Recyclers",
+      description: "Find certified recycling partners",
+      color: "bg-blue-500",
+      hoverColor: "hover:bg-blue-600",
+      path: "/user/recyclers",
+    },
+    {
+      icon: History,
+      title: "Track Deliveries",
+      description: "Monitor your pickup & delivery status",
+      color: "bg-purple-500",
+      hoverColor: "hover:bg-purple-600",
+      path: "/user/deliveries",
+    },
+    {
+      icon: Settings,
+      title: "Manage Profile",
+      description: "Update your account settings",
+      color: "bg-gray-600",
+      hoverColor: "hover:bg-gray-700",
+      path: "/user/profile",
     },
   ];
 
@@ -87,35 +140,45 @@ const UserDashboard = () => {
           ))}
         </div>
 
+        {/* Big Create Listing Button */}
+        <motion.button
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          onClick={() => navigate("/user/create-listing")}
+          className="w-full bg-gradient-to-r from-brand-green to-green-600 text-white py-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 mb-8 flex items-center justify-center gap-3"
+        >
+          <Plus className="w-6 h-6" />
+          <span className="text-xl font-semibold">Create New Listing</span>
+        </motion.button>
+
         {/* Quick Actions */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
           className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-8"
         >
-          <h2 className="text-xl font-bold text-gray-900 mb-4">
-            Quick Actions
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <button className="p-4 border-2 border-dashed border-brand-green rounded-lg hover:bg-brand-green/5 transition-colors text-left">
-              <p className="font-medium text-gray-900">Create New Listing</p>
-              <p className="text-sm text-gray-500 mt-1">
-                Post your e-waste for recycling
-              </p>
-            </button>
-            <button className="p-4 border-2 border-dashed border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-left">
-              <p className="font-medium text-gray-900">Browse Recyclers</p>
-              <p className="text-sm text-gray-500 mt-1">
-                Find certified recyclers nearby
-              </p>
-            </button>
-            <button className="p-4 border-2 border-dashed border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-left">
-              <p className="font-medium text-gray-900">Track Deliveries</p>
-              <p className="text-sm text-gray-500 mt-1">
-                Monitor your e-waste pickups
-              </p>
-            </button>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">Quick Actions</h2>
+            <Recycle className="w-6 h-6 text-brand-green" />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {quickActions.map((action, index) => (
+              <motion.button
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.6 + index * 0.1 }}
+                onClick={() => navigate(action.path)}
+                className={`${action.color} ${action.hoverColor} text-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 text-left group`}
+              >
+                <action.icon className="w-8 h-8 mb-3 group-hover:scale-110 transition-transform" />
+                <h3 className="font-semibold text-lg mb-1">{action.title}</h3>
+                <p className="text-sm text-white/90">{action.description}</p>
+              </motion.button>
+            ))}
           </div>
         </motion.div>
 
