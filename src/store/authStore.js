@@ -21,6 +21,12 @@ const useAuthStore = create(
       updateUser: (userData) => {
         set((state) => ({ user: { ...state.user, ...userData } }));
       },
+
+      updateUserAddress: (addressData) => {
+        set((state) => ({
+          user: { ...state.user, addresses: addressData },
+        }));
+      },
     }),
     {
       name: "auth-storage",

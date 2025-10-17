@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, MapPin, Phone, Mail, Clock } from "lucide-react";
+import { Plus, MapPin, Phone, Mail, Clock, Loader2 } from "lucide-react";
+import { toast } from "react-toastify";
 import Input from "../../../components/ui/input";
 import useListingStore from "../../../store/listingStore";
 import useAuthStore from "../../../store/authStore";
+import { useUpdateUserAddress } from "../../../services/authService";
 
 const Step4ContactAddress = () => {
   const { user } = useAuthStore();
@@ -13,6 +15,10 @@ const Step4ContactAddress = () => {
     address: "",
     location: "",
   });
+
+  // Use the update address hook
+  const { mutate: updateUserAddress, isPending: isAddingAddress } =
+    useUpdateUserAddress();
 
   // Get addresses from user profile
   const userAddresses = user?.addresses || [];
@@ -34,15 +40,31 @@ const Step4ContactAddress = () => {
 
   const handleAddNewAddress = () => {
     if (!newAddress.address || !newAddress.location) {
+      toast.error("Please fill in all address fields");
       return;
     }
 
-    // In real app, this would call API to add address to user profile
-    // For now, just use it locally
-    handleChange("address", newAddress.address);
-    handleChange("location", newAddress.location);
-    setShowAddAddressModal(false);
-    setNewAddress({ address: "", location: "" });
+    // Call API to add address to user profile
+    updateUserAddress(
+      {
+        userId: user.id || user._id,
+        addressData: { address: newAddress.address },
+      },
+      {
+        onSuccess: (data) => {
+          toast.success("Address added successfully!");
+          // Use the newly added address for the listing
+          handleChange("address", newAddress.address);
+          handleChange("location", newAddress.location);
+          // Close modal and reset form
+          setShowAddAddressModal(false);
+          setNewAddress({ address: "", location: "" });
+        },
+        onError: (error) => {
+          toast.error(error.response?.data?.message || "Failed to add address");
+        },
+      }
+    );
   };
 
   const contactMethods = [
@@ -269,20 +291,34 @@ const Step4ContactAddress = () => {
                   <div className="flex gap-3 pt-2">
                     <button
                       onClick={() => setShowAddAddressModal(false)}
-                      className="flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                      disabled={isAddingAddress}
+                      className="flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleAddNewAddress}
-                      disabled={!newAddress.address || !newAddress.location}
-                      className={`flex-1 px-4 py-3 rounded-lg font-medium transition-colors ${
-                        newAddress.address && newAddress.location
+                      disabled={
+                        !newAddress.address ||
+                        !newAddress.location ||
+                        isAddingAddress
+                      }
+                      className={`flex-1 px-4 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 ${
+                        newAddress.address &&
+                        newAddress.location &&
+                        !isAddingAddress
                           ? "bg-brand-green text-white hover:bg-green-600"
                           : "bg-gray-200 text-gray-400 cursor-not-allowed"
                       }`}
                     >
-                      Add Address
+                      {isAddingAddress ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Adding...
+                        </>
+                      ) : (
+                        "Add Address"
+                      )}
                     </button>
                   </div>
                 </div>

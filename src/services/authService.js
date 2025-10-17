@@ -32,6 +32,13 @@ export const authAPI = {
     );
     return data;
   },
+  updateUserAddress: async ({ userId, addressData }) => {
+    const { data } = await axiosInstance.put(
+      `/users/address/${userId}`,
+      addressData
+    );
+    return data;
+  },
 };
 
 // React Query Hooks
@@ -83,6 +90,24 @@ export const useUpdateProfile = () => {
   return useMutation({
     mutationFn: authAPI.updateProfile,
     onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["profile", variables.userId],
+      });
+    },
+  });
+};
+
+export const useUpdateUserAddress = () => {
+  const updateUser = useAuthStore((state) => state.updateUser);
+
+  return useMutation({
+    mutationFn: authAPI.updateUserAddress,
+    onSuccess: (data, variables) => {
+      // Update the user in the store with new addresses
+      if (data.addresses) {
+        updateUser({ addresses: data.addresses });
+      }
+      // Also invalidate queries to refetch user data
       queryClient.invalidateQueries({
         queryKey: ["profile", variables.userId],
       });
