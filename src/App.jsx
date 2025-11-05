@@ -12,6 +12,9 @@ import ForgotPasswordPage from "./features/auth/pages/ForgotPasswordPage";
 import UserDashboard from "./features/user/pages/UserDashboard";
 import RecyclerDashboard from "./features/recycler/pages/RecyclerDashboard";
 import DeliveryPartnerDashboard from "./features/delivery-partner/pages/DeliveryPartnerDashboard";
+import AllDeliveriesPage from "./features/delivery-partner/pages/AllDeliveriesPage";
+import DeliveryDetailsPage from "./features/delivery-partner/pages/DeliveryDetailsPage";
+import DeliveryPartnerProfilePage from "./features/delivery-partner/pages/DeliveryPartnerProfilePage";
 import AdminDashboard from "./features/admin/pages/AdminDashboard";
 
 // User Pages
@@ -149,6 +152,30 @@ function App() {
         element={
           <ProtectedRoute allowedRoles={["delivery"]}>
             <DeliveryPartnerDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/delivery-partner/deliveries"
+        element={
+          <ProtectedRoute allowedRoles={["delivery"]}>
+            <AllDeliveriesPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/delivery-partner/deliveries/:deliveryId"
+        element={
+          <ProtectedRoute allowedRoles={["delivery"]}>
+            <DeliveryDetailsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/delivery-partner/profile"
+        element={
+          <ProtectedRoute allowedRoles={["delivery"]}>
+            <DeliveryPartnerProfilePage />
           </ProtectedRoute>
         }
       />

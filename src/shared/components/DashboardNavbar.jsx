@@ -38,7 +38,7 @@ const DashboardNavbar = ({ navItems = [] }) => {
       console.log("✅ Redirecting to /recycler/profile");
       return "/recycler/profile";
     }
-    if (userRole === "delivery_partner") {
+    if (userRole === "delivery" || userRole === "delivery_partner") {
       console.log("✅ Redirecting to /delivery-partner/profile");
       return "/delivery-partner/profile";
     }

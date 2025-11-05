@@ -1,5 +1,6 @@
 import axiosInstance from "../lib/axios";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { queryClient } from "../lib/queryClient";
 
 // Delivery API calls
 const deliveryAPI = {
@@ -15,10 +16,17 @@ const deliveryAPI = {
     return data;
   },
 
+  // Get single delivery by ID
+  getDeliveryById: async (deliveryId) => {
+    const { data } = await axiosInstance.get(`/deliveries/${deliveryId}`);
+    return data;
+  },
+
   // Update delivery status (for delivery partners)
-  updateDeliveryStatus: async ({ deliveryId, status }) => {
+  updateDeliveryStatus: async ({ deliveryId, status, notes }) => {
     const { data } = await axiosInstance.patch(`/deliveries/${deliveryId}`, {
       status,
+      notes,
     });
     return data;
   },
@@ -38,6 +46,25 @@ export const useGetAllDeliveries = () => {
     queryKey: ["deliveries", "all"],
     queryFn: deliveryAPI.getAllDeliveries,
     staleTime: 1000 * 60 * 2, // 2 minutes
+  });
+};
+
+export const useGetDeliveryById = (deliveryId) => {
+  return useQuery({
+    queryKey: ["delivery", deliveryId],
+    queryFn: () => deliveryAPI.getDeliveryById(deliveryId),
+    enabled: !!deliveryId,
+  });
+};
+
+export const useUpdateDeliveryStatus = () => {
+  return useMutation({
+    mutationFn: deliveryAPI.updateDeliveryStatus,
+    onSuccess: () => {
+      // Invalidate all delivery-related queries
+      queryClient.invalidateQueries({ queryKey: ["deliveries"] });
+      queryClient.invalidateQueries({ queryKey: ["delivery"] });
+    },
   });
 };
 

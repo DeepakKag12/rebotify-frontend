@@ -59,21 +59,31 @@ const LoginPage = () => {
       { email: formData.email, password: formData.password },
       {
         onSuccess: (data) => {
+          console.log("🔍 Login Success - User Data:", data.user);
+          console.log("🔍 User Type:", data.user.userType);
           toast.success("Login successful! Redirecting...");
 
           // Redirect based on user type
           setTimeout(() => {
+            console.log(
+              "🚀 Redirecting based on userType:",
+              data.user.userType
+            );
             switch (data.user.userType) {
               case "admin":
+                console.log("➡️ Navigating to: /admin/dashboard");
                 navigate("/admin/dashboard");
                 break;
               case "recycler":
+                console.log("➡️ Navigating to: /recycler/dashboard");
                 navigate("/recycler/dashboard");
                 break;
               case "delivery":
+                console.log("➡️ Navigating to: /delivery-partner/dashboard");
                 navigate("/delivery-partner/dashboard");
                 break;
               default:
+                console.log("➡️ Navigating to: /user/dashboard");
                 navigate("/user/dashboard");
             }
           }, 1000);
