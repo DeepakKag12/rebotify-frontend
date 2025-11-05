@@ -20,6 +20,10 @@ import MyListingsPage from "./features/user/pages/MyListingsPage";
 import ListingDetailsPage from "./features/user/pages/ListingDetailsPage";
 import EditListingPage from "./features/user/pages/EditListingPage";
 
+// Recycler Pages
+import RecyclerListingsPage from "./features/recycler/pages/RecyclerListingsPage";
+import MyBidsPage from "./features/recycler/pages/MyBidsPage";
+
 // Components
 import ProtectedRoute from "./components/ProtectedRoute";
 import useAuthStore from "./store/authStore";
@@ -101,6 +105,22 @@ function App() {
         element={
           <ProtectedRoute allowedRoles={["recycler"]}>
             <RecyclerDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/recycler/listings"
+        element={
+          <ProtectedRoute allowedRoles={["recycler"]}>
+            <RecyclerListingsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/recycler/bids"
+        element={
+          <ProtectedRoute allowedRoles={["recycler"]}>
+            <MyBidsPage />
           </ProtectedRoute>
         }
       />

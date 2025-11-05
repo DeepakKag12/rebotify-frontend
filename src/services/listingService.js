@@ -109,6 +109,9 @@ export const useGetListings = (page = 1, limit = 10, status = "open") => {
   });
 };
 
+// Alias for consistency
+export const useGetAllListings = useGetListings;
+
 export const useGetListing = (listingId) => {
   return useQuery({
     queryKey: ["listing", listingId],
