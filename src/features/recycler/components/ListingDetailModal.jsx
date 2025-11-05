@@ -15,6 +15,7 @@ import {
   TrendingUp,
   Users,
   Award,
+  XCircle,
 } from "lucide-react";
 import { getImageUrl } from "../../../lib/axios";
 import {
@@ -416,7 +417,7 @@ const ListingDetailModal = ({ listing, onClose }) => {
                 >
                   Close
                 </button>
-                {!isOwnListing && (
+                {!isOwnListing && !hasUserBid && (
                   <button
                     onClick={() => setShowBidForm(true)}
                     className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold flex items-center justify-center gap-2"
@@ -424,6 +425,25 @@ const ListingDetailModal = ({ listing, onClose }) => {
                     <DollarSign className="w-5 h-5" />
                     Place Bid
                   </button>
+                )}
+                {!isOwnListing && hasUserBid && (
+                  <>
+                    <button
+                      onClick={handleWithdrawBid}
+                      disabled={isWithdrawing}
+                      className="flex-1 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <XCircle className="w-5 h-5" />
+                      {isWithdrawing ? "Withdrawing..." : "Withdraw Bid"}
+                    </button>
+                    <button
+                      onClick={() => setShowBidForm(true)}
+                      className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold flex items-center justify-center gap-2"
+                    >
+                      <DollarSign className="w-5 h-5" />
+                      Update Bid
+                    </button>
+                  </>
                 )}
                 {isOwnListing && (
                   <div className="flex-1 px-6 py-3 bg-gray-100 text-gray-500 rounded-lg text-center font-medium">
