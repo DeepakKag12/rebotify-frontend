@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
   MapPin,
@@ -12,27 +13,81 @@ import {
   Loader2,
   Trash2,
   Edit,
+  Award,
+  TrendingUp,
+  Users,
+  X,
 } from "lucide-react";
 import { toast } from "react-toastify";
+import { format } from "date-fns";
 import DashboardNavbar from "../../../shared/components/DashboardNavbar";
 import { getImageUrl } from "../../../lib/axios";
 import {
   useGetListing,
   useDeleteListing,
 } from "../../../services/listingService";
+import {
+  useGetBidsForListing,
+  useSelectBuyer,
+} from "../../../services/bidService";
 
 const ListingDetailsPage = () => {
   const { listingId } = useParams();
   const navigate = useNavigate();
 
+  // Confirmation modal state
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [selectedBidder, setSelectedBidder] = useState(null);
+
   const { data: listingData, isLoading } = useGetListing(listingId);
   const { mutate: deleteListing, isPending: isDeleting } = useDeleteListing();
+
+  // Fetch bids for this listing
+  const {
+    data: bidsData,
+    isLoading: bidsLoading,
+    refetch: refetchBids,
+  } = useGetBidsForListing(listingId);
+  const { mutate: selectBuyer, isPending: isSelecting } = useSelectBuyer();
 
   const navItems = [
     { label: "Dashboard", path: "/user/dashboard" },
     { label: "Create Listing", path: "/user/create-listing" },
     { label: "My Listings", path: "/user/listings" },
   ];
+
+  // Handle select winner - open modal
+  const handleSelectWinner = (bidderId, bidAmount, bidderName, bidderEmail) => {
+    setSelectedBidder({ bidderId, bidAmount, bidderName, bidderEmail });
+    setShowConfirmModal(true);
+  };
+
+  // Confirm selection
+  const confirmSelectWinner = () => {
+    if (!selectedBidder) return;
+
+    selectBuyer(
+      { listingId, bidderId: selectedBidder.bidderId },
+      {
+        onSuccess: () => {
+          toast.success(
+            "🎉 Buyer selected successfully! The listing is now closed and delivery has been scheduled."
+          );
+          setShowConfirmModal(false);
+          setSelectedBidder(null);
+          refetchBids();
+          setTimeout(() => navigate("/user/listings"), 1500);
+        },
+        onError: (error) => {
+          const errorMessage =
+            error.response?.data?.message || "Failed to select buyer";
+          toast.error(errorMessage);
+          setShowConfirmModal(false);
+          setSelectedBidder(null);
+        },
+      }
+    );
+  };
 
   const handleDeleteListing = () => {
     if (window.confirm("Are you sure you want to delete this listing?")) {
@@ -246,41 +301,111 @@ const ListingDetailsPage = () => {
               transition={{ delay: 0.2 }}
               className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
             >
-              <h2 className="text-xl font-bold text-gray-900 mb-4">
-                Bids Received
-              </h2>
-              {listing.bids && listing.bids.length > 0 ? (
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                  <TrendingUp className="w-6 h-6 text-green-600" />
+                  Bids Received
+                </h2>
+                {bidsData?.bids &&
+                  bidsData.bids.length > 0 &&
+                  bidsData.bids[0].bids.length > 0 && (
+                    <div className="flex items-center gap-4">
+                      <div className="text-right">
+                        <p className="text-sm text-gray-500">Highest Bid</p>
+                        <p className="text-2xl font-bold text-green-600">
+                          ${bidsData.highestBid}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-gray-500">Total Bids</p>
+                        <p className="text-xl font-bold text-gray-900">
+                          {bidsData.totalBids}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+              </div>
+
+              {bidsLoading ? (
+                <div className="text-center py-8">
+                  <Loader2 className="w-8 h-8 text-green-600 animate-spin mx-auto mb-2" />
+                  <p className="text-gray-500">Loading bids...</p>
+                </div>
+              ) : bidsData?.bids &&
+                bidsData.bids.length > 0 &&
+                bidsData.bids[0].bids.length > 0 ? (
                 <div className="space-y-3">
-                  {listing.bids.map((bid, index) => (
-                    <div
-                      key={index}
-                      className="p-4 border border-gray-200 rounded-lg hover:border-brand-green transition-colors"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-semibold text-gray-900">
-                            {bid.bidderName || "Anonymous Bidder"}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            {formatDate(bid.createdAt)}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-lg font-bold text-brand-green">
-                            ₹{bid.amount?.toLocaleString()}
-                          </p>
-                          <span className="text-xs text-gray-500">
-                            {bid.status}
-                          </span>
+                  {bidsData.bids[0].bids
+                    .sort((a, b) => b.amount - a.amount)
+                    .map((bid, index) => (
+                      <div
+                        key={bid._id || index}
+                        className={`p-4 border rounded-lg transition-all ${
+                          index === 0
+                            ? "border-green-500 bg-green-50"
+                            : "border-gray-200 hover:border-green-300"
+                        }`}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              {index === 0 && (
+                                <Award className="w-5 h-5 text-green-600" />
+                              )}
+                              <p className="font-semibold text-gray-900">
+                                {bid.bidder?.name || "Anonymous Bidder"}
+                              </p>
+                              {index === 0 && (
+                                <span className="px-2 py-1 bg-green-600 text-white text-xs rounded-full font-semibold">
+                                  Highest Bid
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm text-gray-500">
+                              {format(new Date(bid.createdAt), "PPp")}
+                            </p>
+                            {bid.bidder?.email && (
+                              <p className="text-sm text-gray-600 mt-1 flex items-center gap-1">
+                                <Mail className="w-4 h-4" />
+                                {bid.bidder.email}
+                              </p>
+                            )}
+                            {bid.bidder?.phone && (
+                              <p className="text-sm text-gray-600 flex items-center gap-1">
+                                <Phone className="w-4 h-4" />
+                                {bid.bidder.phone}
+                              </p>
+                            )}
+                          </div>
+                          <div className="text-right ml-4">
+                            <p
+                              className={`text-2xl font-bold mb-2 ${
+                                index === 0 ? "text-green-600" : "text-gray-900"
+                              }`}
+                            >
+                              ${bid.amount}
+                            </p>
+                            {listing.status === "open" && (
+                              <button
+                                onClick={() =>
+                                  handleSelectWinner(
+                                    bid.bidder._id,
+                                    bid.amount,
+                                    bid.bidder.name,
+                                    bid.bidder.email
+                                  )
+                                }
+                                disabled={isSelecting}
+                                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                              >
+                                <CheckCircle className="w-4 h-4" />
+                                Select Winner
+                              </button>
+                            )}
+                          </div>
                         </div>
                       </div>
-                      {bid.message && (
-                        <p className="mt-2 text-sm text-gray-600">
-                          {bid.message}
-                        </p>
-                      )}
-                    </div>
-                  ))}
+                    ))}
                 </div>
               ) : (
                 <div className="text-center py-8 text-gray-500">
@@ -425,6 +550,115 @@ const ListingDetailsPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      <AnimatePresence>
+        {showConfirmModal && selectedBidder && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6"
+            >
+              {/* Close button */}
+              {!isSelecting && (
+                <button
+                  onClick={() => {
+                    setShowConfirmModal(false);
+                    setSelectedBidder(null);
+                  }}
+                  className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              )}
+
+              {/* Icon */}
+              <div className="flex justify-center mb-4">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                  <Award className="w-8 h-8 text-green-600" />
+                </div>
+              </div>
+
+              {/* Content */}
+              <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">
+                Select Winner?
+              </h3>
+              <p className="text-gray-600 text-center mb-6">
+                You're about to finalize this sale. This action cannot be
+                undone.
+              </p>
+
+              {/* Bidder Details */}
+              <div className="bg-gray-50 rounded-lg p-4 mb-6 space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Bidder:</span>
+                  <span className="font-semibold text-gray-900">
+                    {selectedBidder.bidderName}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Email:</span>
+                  <span className="font-medium text-gray-900 text-sm">
+                    {selectedBidder.bidderEmail}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center pt-2 border-t border-gray-200">
+                  <span className="text-gray-600">Sale Amount:</span>
+                  <span className="text-2xl font-bold text-green-600">
+                    ${selectedBidder.bidAmount}
+                  </span>
+                </div>
+              </div>
+
+              {/* What happens next */}
+              <div className="bg-blue-50 rounded-lg p-4 mb-6">
+                <h4 className="font-semibold text-blue-900 mb-2">
+                  What happens next:
+                </h4>
+                <ul className="text-sm text-blue-800 space-y-1">
+                  <li>✓ Receipt will be generated automatically</li>
+                  <li>✓ Delivery will be scheduled</li>
+                  <li>✓ Listing will be marked as closed</li>
+                  <li>✓ Both parties will be notified</li>
+                </ul>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowConfirmModal(false);
+                    setSelectedBidder(null);
+                  }}
+                  disabled={isSelecting}
+                  className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmSelectWinner}
+                  disabled={isSelecting}
+                  className="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {isSelecting ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="w-5 h-5" />
+                      Confirm Sale
+                    </>
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

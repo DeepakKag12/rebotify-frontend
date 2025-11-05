@@ -28,7 +28,6 @@ const UserDashboard = () => {
     { label: "Create Listing", path: "/user/create-listing" },
     { label: "My Listings", path: "/user/listings" },
   ];
-
   const stats = [
     {
       icon: Package,

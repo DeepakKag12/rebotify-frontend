@@ -20,6 +20,36 @@ const DashboardNavbar = ({ navItems = [] }) => {
     });
   };
 
+  // Get profile path based on user role
+  const getProfilePath = () => {
+    console.log("🔍 Debug User Info:", user);
+    console.log("🔍 User Role:", user?.role);
+    console.log("🔍 User UserType:", user?.userType);
+
+    // Check both role and userType fields
+    const userRole = user?.role || user?.userType;
+    console.log("🔍 Final Role:", userRole);
+
+    if (userRole === "user") {
+      console.log("✅ Redirecting to /user/profile");
+      return "/user/profile";
+    }
+    if (userRole === "recycler") {
+      console.log("✅ Redirecting to /recycler/profile");
+      return "/recycler/profile";
+    }
+    if (userRole === "delivery_partner") {
+      console.log("✅ Redirecting to /delivery-partner/profile");
+      return "/delivery-partner/profile";
+    }
+    if (userRole === "admin") {
+      console.log("✅ Redirecting to /admin/profile");
+      return "/admin/profile";
+    }
+    console.log("❌ No matching role, redirecting to /profile");
+    return "/profile";
+  };
+
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-6 py-4">
@@ -94,7 +124,7 @@ const DashboardNavbar = ({ navItems = [] }) => {
                     </div>
                     <div className="py-2">
                       <Link
-                        to="/profile"
+                        to={getProfilePath()}
                         className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                         onClick={() => setIsDropdownOpen(false)}
                       >
@@ -128,6 +158,13 @@ const DashboardNavbar = ({ navItems = [] }) => {
                 {item.label}
               </Link>
             ))}
+            {/* Profile Link */}
+            <Link
+              to={getProfilePath()}
+              className="text-sm text-gray-700 hover:text-brand-green font-medium transition-colors"
+            >
+              Profile
+            </Link>
           </div>
         )}
       </div>

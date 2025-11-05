@@ -112,6 +112,8 @@ export const useSelectBuyer = () => {
       queryClient.invalidateQueries({ queryKey: ["bids"] });
       queryClient.invalidateQueries({ queryKey: ["listings"] });
       queryClient.invalidateQueries({ queryKey: ["seller-listings"] });
+      queryClient.invalidateQueries({ queryKey: ["transactions"] }); // Invalidate transactions to show receipt
+      queryClient.invalidateQueries({ queryKey: ["deliveries"] }); // Invalidate deliveries to show new delivery
     },
   });
 };
