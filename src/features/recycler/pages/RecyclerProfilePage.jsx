@@ -12,14 +12,11 @@ import {
   DollarSign,
   Package,
   Eye,
-  Download,
   Printer,
   Truck,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useReactToPrint } from "react-to-print";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
 import DashboardNavbar from "../../../shared/components/DashboardNavbar";
 import Receipt from "../../../shared/components/Receipt";
 import { useGetUserTransactions } from "../../../services/transactionService";
@@ -72,33 +69,9 @@ const RecyclerProfilePage = () => {
 
   // Handle print receipt
   const handlePrint = useReactToPrint({
-    content: () => receiptRef.current,
+    contentRef: receiptRef,
     documentTitle: `Receipt-${selectedTransaction?.receiptNumber}`,
   });
-
-  // Handle download as PDF
-  const handleDownloadPDF = async () => {
-    if (!receiptRef.current) return;
-
-    const canvas = await html2canvas(receiptRef.current, {
-      scale: 2,
-      logging: false,
-      useCORS: true,
-    });
-
-    const imgData = canvas.toDataURL("image/png");
-    const pdf = new jsPDF({
-      orientation: "portrait",
-      unit: "mm",
-      format: "a4",
-    });
-
-    const imgWidth = 210;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-    pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
-    pdf.save(`Receipt-${selectedTransaction?.receiptNumber}.pdf`);
-  };
 
   const openReceiptModal = (transaction) => {
     setSelectedTransaction(transaction);
@@ -454,13 +427,6 @@ const RecyclerProfilePage = () => {
                     Print
                   </button>
                   <button
-                    onClick={handleDownloadPDF}
-                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium flex items-center gap-2"
-                  >
-                    <Download className="w-4 h-4" />
-                    Download PDF
-                  </button>
-                  <button
                     onClick={() => {
                       setShowReceiptModal(false);
                       setSelectedTransaction(null);
@@ -474,11 +440,9 @@ const RecyclerProfilePage = () => {
 
               {/* Receipt Content */}
               <div className="p-6">
-                <Receipt
-                  ref={receiptRef}
-                  transaction={selectedTransaction}
-                  userRole="buyer"
-                />
+                <div ref={receiptRef}>
+                  <Receipt transaction={selectedTransaction} userRole="buyer" />
+                </div>
               </div>
             </motion.div>
           </div>
