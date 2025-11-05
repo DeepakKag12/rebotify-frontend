@@ -17,7 +17,10 @@ import {
   Award,
 } from "lucide-react";
 import { getImageUrl } from "../../../lib/axios";
-import { useGetBidsForListing, useWithdrawBid } from "../../../services/bidService";
+import {
+  useGetBidsForListing,
+  useWithdrawBid,
+} from "../../../services/bidService";
 import { format } from "date-fns";
 import BidFormModal from "./BidFormModal";
 import useAuthStore from "../../../store/authStore";
@@ -34,7 +37,7 @@ const ListingDetailModal = ({ listing, onClose }) => {
     isLoading: bidsLoading,
     refetch: refetchBids,
   } = useGetBidsForListing(listing._id);
-  
+
   // Withdraw bid mutation
   const { mutate: withdrawBid, isPending: isWithdrawing } = useWithdrawBid();
 
@@ -44,19 +47,23 @@ const ListingDetailModal = ({ listing, onClose }) => {
   // Check if current user is the seller
   const isOwnListing =
     listing.seller._id === user?.id || listing.seller === user?.id;
-  
+
   // Get all bids sorted by amount
   const allBids = bidsData?.bids?.[0]?.bids || [];
-  
+
   // Check if current user has placed a bid
-  const userBid = allBids.find(bid => bid.bidder?._id === user?.id);
+  const userBid = allBids.find((bid) => bid.bidder?._id === user?.id);
   const hasUserBid = !!userBid;
-  
+
   const sortedBids = [...allBids].sort((a, b) => b.amount - a.amount);
-  
+
   // Handle withdraw bid
   const handleWithdrawBid = () => {
-    if (window.confirm(`Are you sure you want to withdraw your bid of $${userBid?.amount}?`)) {
+    if (
+      window.confirm(
+        `Are you sure you want to withdraw your bid of $${userBid?.amount}?`
+      )
+    ) {
       withdrawBid(
         { listingId: listing._id },
         {
@@ -73,8 +80,6 @@ const ListingDetailModal = ({ listing, onClose }) => {
       );
     }
   };
-  const allBids = bidsData?.bids?.[0]?.bids || [];
-  const sortedBids = [...allBids].sort((a, b) => b.amount - a.amount);
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % images.length);
