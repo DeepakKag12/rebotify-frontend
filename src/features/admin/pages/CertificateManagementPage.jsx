@@ -422,9 +422,9 @@ const CertificateManagementPage = () => {
                   </label>
                   {selectedCertificate.uploadDocument ? (
                     <a
-                      href={`${
-                        import.meta.env.VITE_API_URL || "http://localhost:5000"
-                      }${selectedCertificate.uploadDocument}`}
+                      href={`${"http://localhost:3005"}/${
+                        selectedCertificate.uploadDocument
+                      }`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"

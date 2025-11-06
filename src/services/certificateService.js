@@ -9,7 +9,7 @@ export const useMyCertificates = () => {
     queryKey: ["myCertificates"],
     queryFn: async () => {
       const response = await axios.get("/certificates");
-      return response.data;
+      return response.data.certificates; // Return just the certificates array
     },
   });
 };

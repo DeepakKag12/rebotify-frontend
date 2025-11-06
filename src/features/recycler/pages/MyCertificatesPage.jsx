@@ -108,13 +108,13 @@ const MyCertificatesPage = () => {
 
   const handleEditClick = (certificate) => {
     setSelectedCertificate(certificate);
+    const validityDate =
+      certificate.validityPeriod?.end || certificate.validityPeriod;
     setFormData({
       documentType: certificate.documentType,
       certificateNumber: certificate.certificateNumber,
       issuingAuthority: certificate.issuingAuthority,
-      validityPeriod: new Date(certificate.validityPeriod)
-        .toISOString()
-        .split("T")[0],
+      validityPeriod: new Date(validityDate).toISOString().split("T")[0],
       uploadDocument: null,
     });
     setEditModalOpen(true);
@@ -216,7 +216,7 @@ const MyCertificatesPage = () => {
           <div className="flex justify-center items-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
           </div>
-        ) : certificates?.length === 0 ? (
+        ) : !certificates || certificates?.length === 0 ? (
           <Card className="p-12 text-center bg-white">
             <svg
               className="mx-auto h-12 w-12 text-gray-400 mb-4"
@@ -280,7 +280,9 @@ const MyCertificatesPage = () => {
                   <div>
                     <p className="text-xs text-gray-500">Valid Until</p>
                     <p className="text-sm font-medium text-gray-900">
-                      {formatDate(cert.validityPeriod)}
+                      {formatDate(
+                        cert.validityPeriod?.end || cert.validityPeriod
+                      )}
                     </p>
                   </div>
                 </div>
@@ -288,9 +290,7 @@ const MyCertificatesPage = () => {
                 {cert.uploadDocument && (
                   <div className="mb-4">
                     <a
-                      href={`${
-                        import.meta.env.VITE_API_URL || "http://localhost:5000"
-                      }${cert.uploadDocument}`}
+                      href={`${"http://localhost:3005"}/${cert.uploadDocument}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm text-purple-600 hover:text-purple-800 flex items-center"
