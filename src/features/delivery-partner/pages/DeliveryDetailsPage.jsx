@@ -262,7 +262,8 @@ const DeliveryDetailsPage = () => {
                   <MapPin className="w-5 h-5 text-gray-400 mt-0.5" />
                   <div>
                     <p className="text-gray-900">
-                      {delivery.sellerId?.address || "Address not provided"}
+                      {delivery.sellerId?.addresses?.[0]?.address ||
+                        "Address not provided"}
                     </p>
                     <p className="text-sm text-gray-600">Pickup Address</p>
                   </div>
@@ -321,7 +322,8 @@ const DeliveryDetailsPage = () => {
                   <MapPin className="w-5 h-5 text-gray-400 mt-0.5" />
                   <div>
                     <p className="text-gray-900">
-                      {delivery.buyerId?.address || "Address not provided"}
+                      {delivery.buyerId?.addresses?.[0]?.address ||
+                        "Address not provided"}
                     </p>
                     <p className="text-sm text-gray-600">Delivery Address</p>
                   </div>

@@ -22,12 +22,10 @@ const DashboardNavbar = ({ navItems = [] }) => {
 
   // Get profile path based on user role
   const getProfilePath = () => {
-    console.log("🔍 Debug User Info:", user);
-    console.log("🔍 User Role:", user?.role);
     console.log("🔍 User UserType:", user?.userType);
 
     // Check both role and userType fields
-    const userRole = user?.role || user?.userType;
+    const userRole = user?.userType;
     console.log("🔍 Final Role:", userRole);
 
     if (userRole === "user") {
@@ -40,7 +38,7 @@ const DashboardNavbar = ({ navItems = [] }) => {
     }
     if (userRole === "delivery" || userRole === "delivery_partner") {
       console.log("✅ Redirecting to /delivery-partner/profile");
-      return "/delivery-partner/profile";
+      return "/delivery-partner/dashboard";
     }
     if (userRole === "admin") {
       console.log("✅ Redirecting to /admin/profile");

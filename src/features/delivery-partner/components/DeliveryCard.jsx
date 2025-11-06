@@ -95,7 +95,8 @@ const DeliveryCard = ({ delivery, onStatusUpdate }) => {
                 {delivery.sellerId?.name}
               </p>
               <p className="text-gray-600 line-clamp-1">
-                {delivery.sellerId?.address || "Address not provided"}
+                {delivery.sellerId?.addresses?.[0]?.address ||
+                  "Address not provided"}
               </p>
               {delivery.sellerId?.phone && (
                 <p className="text-gray-600 flex items-center gap-1 mt-1">
@@ -117,7 +118,8 @@ const DeliveryCard = ({ delivery, onStatusUpdate }) => {
                 {delivery.buyerId?.name}
               </p>
               <p className="text-gray-600 line-clamp-1">
-                {delivery.buyerId?.address || "Address not provided"}
+                {delivery.buyerId?.addresses?.[0]?.address ||
+                  "Address not provided"}
               </p>
               {delivery.buyerId?.phone && (
                 <p className="text-gray-600 flex items-center gap-1 mt-1">

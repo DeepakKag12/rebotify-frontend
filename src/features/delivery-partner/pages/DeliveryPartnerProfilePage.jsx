@@ -144,7 +144,7 @@ const DeliveryPartnerProfilePage = () => {
                       Address
                     </label>
                     <p className="text-lg font-semibold text-gray-900">
-                      {user?.address || "N/A"}
+                      {user?.addresses?.[0]?.address || "N/A"}
                     </p>
                   </div>
                 </div>

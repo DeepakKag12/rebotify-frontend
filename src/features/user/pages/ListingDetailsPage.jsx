@@ -56,8 +56,11 @@ const ListingDetailsPage = () => {
     { label: "My Listings", path: "/user/listings" },
   ];
 
-  // Handle select winner - open modal
+  // Handle select winner - open modal (v2 - modal only, no browser confirm)
   const handleSelectWinner = (bidderId, bidAmount, bidderName, bidderEmail) => {
+    console.log(
+      "🎯 handleSelectWinner called - Opening modal (NO browser confirm)"
+    );
     setSelectedBidder({ bidderId, bidAmount, bidderName, bidderEmail });
     setShowConfirmModal(true);
   };
@@ -559,7 +562,7 @@ const ListingDetailsPage = () => {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6"
+              className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 relative"
             >
               {/* Close button */}
               {!isSelecting && (
@@ -568,7 +571,7 @@ const ListingDetailsPage = () => {
                     setShowConfirmModal(false);
                     setSelectedBidder(null);
                   }}
-                  className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+                  className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition"
                 >
                   <X className="w-6 h-6" />
                 </button>

@@ -1,14 +1,24 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { X, DollarSign, TrendingUp, AlertCircle, Loader2 } from "lucide-react";
+import {
+  X,
+  DollarSign,
+  TrendingUp,
+  AlertCircle,
+  Loader2,
+  MapPin,
+} from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { useMakeBid } from "../../../services/bidService";
 import useAuthStore from "../../../store/authStore";
+import AddressSelectionModal from "./AddressSelectionModal";
 
 const BidFormModal = ({ listing, currentHighestBid, onClose, onSuccess }) => {
   const { user } = useAuthStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showAddressModal, setShowAddressModal] = useState(false);
+  const [selectedDeliveryAddress, setSelectedDeliveryAddress] = useState(null);
 
   const {
     register,
@@ -42,6 +52,13 @@ const BidFormModal = ({ listing, currentHighestBid, onClose, onSuccess }) => {
       return;
     }
 
+    // Check if delivery address is selected
+    if (!selectedDeliveryAddress) {
+      toast.error("Please select a delivery address first");
+      setShowAddressModal(true);
+      return;
+    }
+
     setIsSubmitting(true);
 
     makeBid(
@@ -65,6 +82,11 @@ const BidFormModal = ({ listing, currentHighestBid, onClose, onSuccess }) => {
         },
       }
     );
+  };
+
+  const handleAddressSelected = (address) => {
+    setSelectedDeliveryAddress(address);
+    toast.success("Delivery address selected!");
   };
 
   return (
@@ -138,6 +160,46 @@ const BidFormModal = ({ listing, currentHighestBid, onClose, onSuccess }) => {
 
           {/* Bid Form */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {/* Delivery Address Selection */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Delivery Address
+              </label>
+              {selectedDeliveryAddress ? (
+                <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-start gap-3 flex-1">
+                      <MapPin className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                      <div className="flex-1">
+                        <p className="text-sm text-gray-900 font-medium">
+                          {selectedDeliveryAddress.address}
+                        </p>
+                        <p className="text-xs text-green-600 mt-1">
+                          ✓ Address confirmed
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowAddressModal(true)}
+                      className="text-sm text-green-600 hover:text-green-700 font-medium whitespace-nowrap"
+                    >
+                      Change
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setShowAddressModal(true)}
+                  className="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-green-500 hover:text-green-600 hover:bg-green-50 transition flex items-center justify-center gap-2"
+                >
+                  <MapPin className="w-5 h-5" />
+                  Select Delivery Address
+                </button>
+              )}
+            </div>
+
             {/* Bid Amount Input */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -242,6 +304,14 @@ const BidFormModal = ({ listing, currentHighestBid, onClose, onSuccess }) => {
           </form>
         </motion.div>
       </div>
+
+      {/* Address Selection Modal */}
+      {showAddressModal && (
+        <AddressSelectionModal
+          onClose={() => setShowAddressModal(false)}
+          onAddressSelected={handleAddressSelected}
+        />
+      )}
     </div>
   );
 };

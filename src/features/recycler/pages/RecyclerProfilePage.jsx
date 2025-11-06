@@ -184,7 +184,7 @@ const RecyclerProfilePage = () => {
                     <div>
                       <p className="text-sm text-gray-500">Address</p>
                       <p className="font-semibold text-gray-900">
-                        {user?.address || "N/A"}
+                        {user?.addresses?.[0]?.address || "N/A"}
                       </p>
                     </div>
                   </div>

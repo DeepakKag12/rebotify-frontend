@@ -36,6 +36,21 @@ import useAuthStore from "./store/authStore";
 function App() {
   const { isAuthenticated, user } = useAuthStore();
 
+  // Helper function to get dashboard path based on user type
+  const getDashboardPath = (userType) => {
+    switch (userType) {
+      case "admin":
+        return "/admin/dashboard";
+      case "recycler":
+        return "/recycler/dashboard";
+      case "delivery":
+        return "/delivery-partner/dashboard";
+      case "user":
+      default:
+        return "/user/dashboard";
+    }
+  };
+
   return (
     <Routes>
       {/* Public Routes */}
@@ -44,7 +59,7 @@ function App() {
         path="/login"
         element={
           isAuthenticated ? (
-            <Navigate to={`/${user?.userType}/dashboard`} replace />
+            <Navigate to={getDashboardPath(user?.userType)} replace />
           ) : (
             <LoginPage />
           )
@@ -54,7 +69,7 @@ function App() {
         path="/signup"
         element={
           isAuthenticated ? (
-            <Navigate to={`/${user?.userType}/dashboard`} replace />
+            <Navigate to={getDashboardPath(user?.userType)} replace />
           ) : (
             <SignupPage />
           )
