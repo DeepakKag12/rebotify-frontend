@@ -447,7 +447,9 @@ const ListingDetailModal = ({ listing, onClose }) => {
                 )}
                 {!isOwnListing && listing.status === "closed" && (
                   <div className="flex-1 px-6 py-3 bg-gray-100 text-gray-600 rounded-lg text-center font-medium">
-                    {hasUserBid && userBid?.amount === Math.max(...allBids.map(b => b.amount)) ? (
+                    {hasUserBid &&
+                    userBid?.amount ===
+                      Math.max(...allBids.map((b) => b.amount)) ? (
                       <span className="text-green-600 font-semibold flex items-center justify-center gap-2">
                         <Award className="w-5 h-5" />
                         You Won This Bid!
