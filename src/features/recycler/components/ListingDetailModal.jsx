@@ -417,7 +417,7 @@ const ListingDetailModal = ({ listing, onClose }) => {
                 >
                   Close
                 </button>
-                {!isOwnListing && !hasUserBid && (
+                {!isOwnListing && !hasUserBid && listing.status === "open" && (
                   <button
                     onClick={() => setShowBidForm(true)}
                     className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold flex items-center justify-center gap-2"
@@ -426,7 +426,7 @@ const ListingDetailModal = ({ listing, onClose }) => {
                     Place Bid
                   </button>
                 )}
-                {!isOwnListing && hasUserBid && (
+                {!isOwnListing && hasUserBid && listing.status === "open" && (
                   <>
                     <button
                       onClick={handleWithdrawBid}
@@ -444,6 +444,18 @@ const ListingDetailModal = ({ listing, onClose }) => {
                       Update Bid
                     </button>
                   </>
+                )}
+                {!isOwnListing && listing.status === "closed" && (
+                  <div className="flex-1 px-6 py-3 bg-gray-100 text-gray-600 rounded-lg text-center font-medium">
+                    {hasUserBid && userBid?.amount === Math.max(...allBids.map(b => b.amount)) ? (
+                      <span className="text-green-600 font-semibold flex items-center justify-center gap-2">
+                        <Award className="w-5 h-5" />
+                        You Won This Bid!
+                      </span>
+                    ) : (
+                      "Listing Closed"
+                    )}
+                  </div>
                 )}
                 {isOwnListing && (
                   <div className="flex-1 px-6 py-3 bg-gray-100 text-gray-500 rounded-lg text-center font-medium">
