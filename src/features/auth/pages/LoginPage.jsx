@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Leaf, Loader2 } from "lucide-react";
@@ -7,11 +7,16 @@ import Input from "../../../components/ui/input";
 import PasswordInput from "../../../components/ui/password-input";
 import Checkbox from "../../../components/ui/checkbox";
 import { Button } from "../../../components/ui/button";
-import { useLogin } from "../../../services/authService";
+import OTPModal from "../../../components/ui/otp-modal";
+import { useLogin, useVerifyOTP } from "../../../services/authService";
+import useAuthStore from "../../../store/authStore";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { mutate: login, isPending } = useLogin();
+  const { mutate: login, isPending: isLoginPending } = useLogin();
+  const { mutate: verifyOTP, isPending: isVerifyPending } = useVerifyOTP();
+
+  const { otpSession, setOTPSession, clearOTPSession } = useAuthStore();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -20,6 +25,25 @@ const LoginPage = () => {
   });
 
   const [errors, setErrors] = useState({});
+  const [otpModalOpen, setOtpModalOpen] = useState(false);
+
+  // Check for existing OTP session on component mount
+  useEffect(() => {
+    if (otpSession) {
+      // Check if OTP session is still valid
+      const expiresAt = new Date(otpSession.expiresAt).getTime();
+      const now = new Date().getTime();
+
+      if (expiresAt > now) {
+        // OTP session is still valid, show modal
+        setOtpModalOpen(true);
+      } else {
+        // OTP session expired, clear it
+        clearOTPSession();
+        toast.error("OTP session expired. Please login again.");
+      }
+    }
+  }, [otpSession, clearOTPSession]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -59,24 +83,21 @@ const LoginPage = () => {
       { email: formData.email, password: formData.password },
       {
         onSuccess: (data) => {
-          toast.success("Login successful! Redirecting...");
-
-          // Redirect based on user type
-          setTimeout(() => {
-            switch (data.user.userType) {
-              case "admin":
-                navigate("/admin/dashboard");
-                break;
-              case "recycler":
-                navigate("/recycler/dashboard");
-                break;
-              case "delivery":
-                navigate("/delivery-partner/dashboard");
-                break;
-              default:
-                navigate("/user/dashboard");
-            }
-          }, 1000);
+          if (data.requireOTP) {
+            // OTP required - save session and open modal
+            const otpSessionData = {
+              userId: data.userId,
+              email: data.email,
+              expiresAt: data.expiresAt,
+            };
+            setOTPSession(otpSessionData);
+            setOtpModalOpen(true);
+            toast.info("OTP sent to your email");
+          } else {
+            // Direct login (shouldn't happen with OTP enabled, but keeping for safety)
+            toast.success("Login successful! Redirecting...");
+            redirectToDashboard(data.user.userType);
+          }
         },
         onError: (error) => {
           toast.error(
@@ -85,6 +106,65 @@ const LoginPage = () => {
         },
       }
     );
+  };
+
+  const handleVerifyOTP = (otp) => {
+    if (!otpSession) return;
+
+    verifyOTP(
+      { userId: otpSession.userId, otp },
+      {
+        onSuccess: (data) => {
+          toast.success("Login successful! Redirecting...");
+          clearOTPSession();
+          setOtpModalOpen(false);
+          redirectToDashboard(data.user.userType);
+        },
+        onError: (error) => {
+          toast.error(
+            error.response?.data?.message || "Invalid OTP. Please try again."
+          );
+        },
+      }
+    );
+  };
+
+  const redirectToDashboard = (userType) => {
+    setTimeout(() => {
+      switch (userType) {
+        case "admin":
+          navigate("/admin/dashboard");
+          break;
+        case "recycler":
+          navigate("/recycler/dashboard");
+          break;
+        case "delivery":
+          navigate("/delivery-partner/dashboard");
+          break;
+        default:
+          navigate("/user/dashboard");
+      }
+    }, 1000);
+  };
+
+  const handleCloseOTPModal = () => {
+    // Don't allow closing modal during verification or if timer hasn't expired
+    if (isVerifyPending) return;
+
+    if (otpSession) {
+      const expiresAt = new Date(otpSession.expiresAt).getTime();
+      const now = new Date().getTime();
+
+      // Only allow closing if OTP has expired
+      if (expiresAt > now) {
+        toast.warning("Please verify OTP or wait for it to expire");
+        return;
+      }
+    }
+
+    // OTP expired, clear session and close modal
+    clearOTPSession();
+    setOtpModalOpen(false);
   };
 
   return (
@@ -159,10 +239,10 @@ const LoginPage = () => {
 
             <Button
               type="submit"
-              disabled={isPending}
+              disabled={isLoginPending}
               className="w-full h-11 bg-brand-green hover:bg-brand-green-dark text-white font-medium rounded-lg transition-all duration-200"
             >
-              {isPending ? (
+              {isLoginPending ? (
                 <>
                   <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                   Signing in...
@@ -261,6 +341,16 @@ const LoginPage = () => {
           <div className="absolute bottom-20 right-20 w-96 h-96 bg-white rounded-full blur-3xl"></div>
         </div>
       </div>
+
+      {/* OTP Modal */}
+      <OTPModal
+        isOpen={otpModalOpen}
+        onClose={handleCloseOTPModal}
+        onVerify={handleVerifyOTP}
+        email={otpSession?.email || ""}
+        expiresAt={otpSession?.expiresAt || new Date()}
+        isPending={isVerifyPending}
+      />
     </div>
   );
 };

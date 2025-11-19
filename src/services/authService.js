@@ -15,6 +15,11 @@ export const authAPI = {
     return data;
   },
 
+  verifyOTP: async (otpData) => {
+    const { data } = await axiosInstance.post("/users/verify-otp", otpData);
+    return data;
+  },
+
   logout: async () => {
     const { data } = await axiosInstance.post("/users/logout");
     return data;
@@ -55,10 +60,20 @@ export const useSignup = () => {
 };
 
 export const useLogin = () => {
+  return useMutation({
+    mutationFn: authAPI.login,
+    onSuccess: (data) => {
+      // Login returns OTP requirement, not immediate auth
+      // Actual auth happens in verifyOTP
+    },
+  });
+};
+
+export const useVerifyOTP = () => {
   const setAuth = useAuthStore((state) => state.setAuth);
 
   return useMutation({
-    mutationFn: authAPI.login,
+    mutationFn: authAPI.verifyOTP,
     onSuccess: (data) => {
       // Backend sets httpOnly cookie, but we'll also store in localStorage for client-side checks
       setAuth(data.user, data.token || "cookie-based");
