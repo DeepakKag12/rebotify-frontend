@@ -10,6 +10,7 @@ import { Button } from "../../../components/ui/button";
 import OTPModal from "../../../components/ui/otp-modal";
 import { useLogin, useVerifyOTP } from "../../../services/authService";
 import useAuthStore from "../../../store/authStore";
+import { validateEmail } from "../../../utils/validationSchemas";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -62,14 +63,19 @@ const LoginPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleChange = (e) => {
+  const handleChange = async (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
-    // Clear error when user starts typing
-    if (errors[name]) {
+
+    // Real-time validation for email
+    if (name === "email") {
+      const error = await validateEmail(value);
+      setErrors((prev) => ({ ...prev, email: error }));
+    } else if (errors[name]) {
+      // Clear error for other fields when user starts typing
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };

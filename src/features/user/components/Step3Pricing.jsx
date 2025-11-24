@@ -1,13 +1,24 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { IndianRupee, Sparkles, TrendingUp } from "lucide-react";
 import Input from "../../../components/ui/input";
 import useListingStore from "../../../store/listingStore";
+import { validatePrice } from "../../../utils/validationSchemas";
 
 const Step3Pricing = () => {
   const { listingFormData, updateListingField } = useListingStore();
+  const [errors, setErrors] = useState({});
 
   const handleChange = (field, value) => {
     updateListingField(field, value);
+  };
+
+  // Real-time validation for price
+  const handlePriceChange = async (e) => {
+    const { value } = e.target;
+    handleChange("price", value);
+    const error = await validatePrice(Number(value));
+    setErrors((prev) => ({ ...prev, price: error }));
   };
 
   const toggleDeliveryOption = (option) => {
@@ -89,13 +100,34 @@ const Step3Pricing = () => {
               <input
                 type="number"
                 value={listingFormData.price}
-                onChange={(e) => handleChange("price", e.target.value)}
+                onChange={handlePriceChange}
                 placeholder="25000"
-                className="w-full h-11 rounded-lg border border-gray-300 bg-white pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-green focus:border-transparent"
+                className={`w-full h-11 rounded-lg border ${
+                  errors.price ? "border-red-500" : "border-gray-300"
+                } bg-white pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 ${
+                  errors.price ? "focus:ring-red-500" : "focus:ring-brand-green"
+                } focus:border-transparent`}
                 min="0"
+                step="0.01"
                 required
               />
             </div>
+            {errors.price && (
+              <p className="mt-1.5 text-sm text-red-500 flex items-center gap-1">
+                <svg
+                  className="w-4 h-4"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                {errors.price}
+              </p>
+            )}
           </div>
 
           {/* Price Type */}

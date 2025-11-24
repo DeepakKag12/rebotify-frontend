@@ -5,6 +5,7 @@ import { Leaf, Loader2, ArrowLeft, Mail } from "lucide-react";
 import { toast } from "react-toastify";
 import Input from "../../../components/ui/input";
 import { Button } from "../../../components/ui/button";
+import { validateEmail } from "../../../utils/validationSchemas";
 
 const ForgotPasswordPage = () => {
   const [email, setEmail] = useState("");
@@ -12,22 +13,24 @@ const ForgotPasswordPage = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const validateEmail = () => {
-    if (!email) {
-      setError("Email is required");
-      return false;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError("Please enter a valid email");
-      return false;
-    }
-    return true;
+  const handleChange = async (e) => {
+    const value = e.target.value;
+    setEmail(value);
+
+    // Real-time validation
+    const validationError = await validateEmail(value);
+    setError(validationError || "");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validateEmail()) return;
+    // Validate email before submitting
+    const validationError = await validateEmail(email);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
 
     setIsLoading(true);
 
@@ -37,13 +40,6 @@ const ForgotPasswordPage = () => {
       setIsSubmitted(true);
       toast.success("Password reset link sent to your email!");
     }, 1500);
-  };
-
-  const handleChange = (e) => {
-    setEmail(e.target.value);
-    if (error) {
-      setError("");
-    }
   };
 
   if (isSubmitted) {

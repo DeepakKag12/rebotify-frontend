@@ -1,10 +1,18 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import Input from "../../../components/ui/input";
 import useListingStore from "../../../store/listingStore";
+import {
+  validateBrand,
+  validateModel,
+  validateYear,
+  validateDescription,
+} from "../../../utils/validationSchemas";
 
 const Step2ProductDetails = () => {
   const { listingFormData, updateListingField } = useListingStore();
+  const [errors, setErrors] = useState({});
 
   const productCategories = [
     "Laptop",
@@ -47,6 +55,35 @@ const Step2ProductDetails = () => {
 
   const handleChange = (field, value) => {
     updateListingField(field, value);
+  };
+
+  // Real-time validation handlers
+  const handleBrandChange = async (e) => {
+    const { value } = e.target;
+    handleChange("brand", value);
+    const error = await validateBrand(value);
+    setErrors((prev) => ({ ...prev, brand: error }));
+  };
+
+  const handleModelChange = async (e) => {
+    const { value } = e.target;
+    handleChange("model", value);
+    const error = await validateModel(value);
+    setErrors((prev) => ({ ...prev, model: error }));
+  };
+
+  const handleYearChange = async (e) => {
+    const { value } = e.target;
+    handleChange("manufacture_year", value);
+    const error = await validateYear(Number(value));
+    setErrors((prev) => ({ ...prev, manufacture_year: error }));
+  };
+
+  const handleDescriptionChange = async (e) => {
+    const { value } = e.target;
+    handleChange("description", value);
+    const error = await validateDescription(value);
+    setErrors((prev) => ({ ...prev, description: error }));
   };
 
   const toggleAccessory = (accessory) => {
@@ -120,7 +157,8 @@ const Step2ProductDetails = () => {
             type="text"
             placeholder="e.g., Apple, Samsung, Dell"
             value={listingFormData.brand}
-            onChange={(e) => handleChange("brand", e.target.value)}
+            onChange={handleBrandChange}
+            error={errors.brand}
             required
           />
 
@@ -130,7 +168,8 @@ const Step2ProductDetails = () => {
             type="text"
             placeholder="e.g., iPhone 13 Pro, ThinkPad X1"
             value={listingFormData.model}
-            onChange={(e) => handleChange("model", e.target.value)}
+            onChange={handleModelChange}
+            error={errors.model}
           />
 
           {/* Manufacture Year */}
@@ -139,7 +178,8 @@ const Step2ProductDetails = () => {
             type="number"
             placeholder="e.g., 2020"
             value={listingFormData.manufacture_year}
-            onChange={(e) => handleChange("manufacture_year", e.target.value)}
+            onChange={handleYearChange}
+            error={errors.manufacture_year}
             min="1990"
             max={new Date().getFullYear()}
           />
@@ -180,16 +220,38 @@ const Step2ProductDetails = () => {
         </label>
         <textarea
           value={listingFormData.description}
-          onChange={(e) => handleChange("description", e.target.value)}
+          onChange={handleDescriptionChange}
           placeholder="Describe your product in detail. Include specifications, condition, any defects, reason for selling, etc."
-          className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-green focus:border-transparent resize-none"
+          className={`w-full rounded-lg border ${
+            errors.description ? "border-red-500" : "border-gray-300"
+          } bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 ${
+            errors.description ? "focus:ring-red-500" : "focus:ring-brand-green"
+          } focus:border-transparent resize-none`}
           rows={6}
-          maxLength={500}
+          maxLength={1000}
           required
         />
-        <p className="text-xs text-gray-500 mt-1.5 text-right">
-          {listingFormData.description.length}/500 characters
-        </p>
+        <div className="flex items-center justify-between mt-1.5">
+          {errors.description && (
+            <p className="text-sm text-red-500 flex items-center gap-1">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              {errors.description}
+            </p>
+          )}
+          <p
+            className={`text-xs ${
+              errors.description ? "text-red-500" : "text-gray-500"
+            } ml-auto`}
+          >
+            {listingFormData.description.length}/1000 characters
+          </p>
+        </div>
       </div>
 
       {/* Accessories Included */}

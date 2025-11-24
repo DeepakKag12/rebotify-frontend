@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   FaFacebookF,
   FaTwitter,
@@ -8,8 +9,38 @@ import {
   FaMapMarkerAlt,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { validateEmail } from "../../../utils/validationSchemas";
+import { toast } from "react-toastify";
 
 const Footer = () => {
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [newsletterError, setNewsletterError] = useState("");
+
+  const handleNewsletterChange = async (e) => {
+    const value = e.target.value;
+    setNewsletterEmail(value);
+
+    // Real-time validation
+    const error = await validateEmail(value);
+    setNewsletterError(error || "");
+  };
+
+  const handleNewsletterSubmit = async (e) => {
+    e.preventDefault();
+
+    // Validate before submitting
+    const error = await validateEmail(newsletterEmail);
+    if (error) {
+      setNewsletterError(error);
+      toast.error(error);
+      return;
+    }
+
+    // Success
+    toast.success("Thank you for subscribing!");
+    setNewsletterEmail("");
+    setNewsletterError("");
+  };
   const quickLinks = [
     { name: "About Us", href: "#about-us" },
     { name: "How It Works", href: "#how-it-works" },
@@ -154,16 +185,33 @@ const Footer = () => {
             <p className="text-white/80 mb-4">
               Get updates on e-waste recycling tips and environmental news
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1 px-4 py-3 rounded-lg bg-white/10 border border-white/30 focus:border-brand-green-light focus:outline-none text-white placeholder-white/50"
-              />
-              <button className="px-6 py-3 bg-brand-green hover:bg-brand-green-dark transition-all duration-300 rounded-lg font-semibold">
+            <form
+              onSubmit={handleNewsletterSubmit}
+              className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
+            >
+              <div className="flex-1">
+                <input
+                  type="email"
+                  value={newsletterEmail}
+                  onChange={handleNewsletterChange}
+                  placeholder="Enter your email"
+                  className={`w-full px-4 py-3 rounded-lg bg-white/10 border ${
+                    newsletterError ? "border-red-500" : "border-white/30"
+                  } focus:border-brand-green-light focus:outline-none text-white placeholder-white/50`}
+                />
+                {newsletterError && (
+                  <p className="text-red-300 text-xs mt-1 text-left">
+                    {newsletterError}
+                  </p>
+                )}
+              </div>
+              <button
+                type="submit"
+                className="px-6 py-3 bg-brand-green hover:bg-brand-green-dark transition-all duration-300 rounded-lg font-semibold"
+              >
                 Subscribe
               </button>
-            </div>
+            </form>
           </div>
         </div>
 

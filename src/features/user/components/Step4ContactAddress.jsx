@@ -6,6 +6,14 @@ import Input from "../../../components/ui/input";
 import useListingStore from "../../../store/listingStore";
 import useAuthStore from "../../../store/authStore";
 import { useUpdateUserAddress } from "../../../services/authService";
+import {
+  validateName,
+  validateEmail,
+  validatePhone,
+  validateOptionalPhone,
+  validateAddress,
+  validateLocation,
+} from "../../../utils/validationSchemas";
 
 const Step4ContactAddress = () => {
   const { user } = useAuthStore();
@@ -15,6 +23,7 @@ const Step4ContactAddress = () => {
     address: "",
     location: "",
   });
+  const [errors, setErrors] = useState({});
 
   // Use the update address hook
   const { mutate: updateUserAddress, isPending: isAddingAddress } =
@@ -29,6 +38,35 @@ const Step4ContactAddress = () => {
 
   const handleChange = (field, value) => {
     updateListingField(field, value);
+  };
+
+  // Real-time validation handlers
+  const handleNameChange = async (e) => {
+    const { value } = e.target;
+    handleChange("name", value);
+    const error = await validateName(value);
+    setErrors((prev) => ({ ...prev, name: error }));
+  };
+
+  const handleEmailChange = async (e) => {
+    const { value } = e.target;
+    handleChange("email", value);
+    const error = await validateEmail(value);
+    setErrors((prev) => ({ ...prev, email: error }));
+  };
+
+  const handlePhoneChange = async (e) => {
+    const { value } = e.target;
+    handleChange("phone", value);
+    const error = await validatePhone(value);
+    setErrors((prev) => ({ ...prev, phone: error }));
+  };
+
+  const handleWhatsappChange = async (e) => {
+    const { value } = e.target;
+    handleChange("whatsapp", value);
+    const error = await validateOptionalPhone(value);
+    setErrors((prev) => ({ ...prev, whatsapp: error }));
   };
 
   const selectAddress = (addressObj) => {
@@ -97,7 +135,8 @@ const Step4ContactAddress = () => {
             label="Full Name"
             type="text"
             value={listingFormData.name || user?.name}
-            onChange={(e) => handleChange("name", e.target.value)}
+            onChange={handleNameChange}
+            error={errors.name}
             placeholder="Your full name"
             required
             disabled
@@ -109,7 +148,8 @@ const Step4ContactAddress = () => {
             label="Email Address"
             type="email"
             value={listingFormData.email || user?.email}
-            onChange={(e) => handleChange("email", e.target.value)}
+            onChange={handleEmailChange}
+            error={errors.email}
             placeholder="your@email.com"
             required
             disabled
@@ -121,15 +161,19 @@ const Step4ContactAddress = () => {
             label="Phone Number"
             type="tel"
             value={listingFormData.phone}
-            onChange={(e) => handleChange("phone", e.target.value)}
+            onChange={handlePhoneChange}
+            error={errors.phone}
             placeholder="+91 98765 43210"
             required
           />
 
           {/* Alternate Phone (Optional) */}
           <Input
-            label="Alternate Phone (Optional)"
+            label="WhatsApp Number (Optional)"
             type="tel"
+            value={listingFormData.whatsapp}
+            onChange={handleWhatsappChange}
+            error={errors.whatsapp}
             placeholder="+91 98765 43210"
           />
         </div>

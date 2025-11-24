@@ -13,12 +13,14 @@ import { toast } from "react-toastify";
 import { useMakeBid } from "../../../services/bidService";
 import useAuthStore from "../../../store/authStore";
 import AddressSelectionModal from "./AddressSelectionModal";
+import { validatePrice } from "../../../utils/validationSchemas";
 
 const BidFormModal = ({ listing, currentHighestBid, onClose, onSuccess }) => {
   const { user } = useAuthStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [selectedDeliveryAddress, setSelectedDeliveryAddress] = useState(null);
+  const [bidError, setBidError] = useState("");
 
   const {
     register,
@@ -38,6 +40,26 @@ const BidFormModal = ({ listing, currentHighestBid, onClose, onSuccess }) => {
     // Set default bid amount to minimum bid
     setValue("amount", minimumBid);
   }, [minimumBid, setValue]);
+
+  // Real-time validation for bid amount
+  const handleBidAmountChange = async (e) => {
+    const { value } = e.target;
+    setValue("amount", value);
+
+    // Validate with Yup
+    const error = await validatePrice(Number(value));
+    if (error) {
+      setBidError(error);
+      return;
+    }
+
+    // Additional validation for minimum bid
+    if (Number(value) < minimumBid) {
+      setBidError(`Bid must be at least $${minimumBid}`);
+    } else {
+      setBidError("");
+    }
+  };
 
   const onSubmit = (data) => {
     // Validate that user is not the seller
@@ -220,14 +242,23 @@ const BidFormModal = ({ listing, currentHighestBid, onClose, onSuccess }) => {
                     validate: (value) =>
                       value > 0 || "Bid amount must be greater than zero",
                   })}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 text-lg font-semibold bg-white"
+                  onChange={handleBidAmountChange}
+                  className={`w-full pl-10 pr-4 py-3 border ${
+                    bidError || errors.amount
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  } rounded-lg focus:ring-2 ${
+                    bidError || errors.amount
+                      ? "focus:ring-red-500"
+                      : "focus:ring-green-500"
+                  } focus:border-transparent text-gray-900 text-lg font-semibold bg-white`}
                   placeholder={minimumBid.toString()}
                 />
               </div>
-              {errors.amount && (
+              {(bidError || errors.amount) && (
                 <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
                   <AlertCircle className="w-4 h-4" />
-                  {errors.amount.message}
+                  {bidError || errors.amount.message}
                 </p>
               )}
             </div>

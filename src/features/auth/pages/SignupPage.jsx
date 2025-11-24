@@ -8,6 +8,11 @@ import PasswordInput from "../../../components/ui/password-input";
 import Checkbox from "../../../components/ui/checkbox";
 import { Button } from "../../../components/ui/button";
 import { useSignup } from "../../../services/authService";
+import {
+  validateName,
+  validateEmail,
+  validateAddress,
+} from "../../../utils/validationSchemas";
 
 const SignupPage = () => {
   const navigate = useNavigate();
@@ -26,6 +31,26 @@ const SignupPage = () => {
   const [addresses, setAddresses] = useState([{ address: "" }]);
 
   const [errors, setErrors] = useState({});
+
+  // Real-time validation handler for name
+  const handleNameChange = async (e) => {
+    const { value } = e.target;
+    setFormData((prev) => ({ ...prev, name: value }));
+
+    // Real-time validation
+    const error = await validateName(value);
+    setErrors((prev) => ({ ...prev, name: error }));
+  };
+
+  // Real-time validation handler for email
+  const handleEmailChange = async (e) => {
+    const { value } = e.target;
+    setFormData((prev) => ({ ...prev, email: value }));
+
+    // Real-time validation
+    const error = await validateEmail(value);
+    setErrors((prev) => ({ ...prev, email: error }));
+  };
 
   const validateForm = () => {
     const newErrors = {};
@@ -83,13 +108,28 @@ const SignupPage = () => {
   };
 
   // Address management functions
-  const handleAddressChange = (index, value) => {
+  const handleAddressChange = async (index, value) => {
     const newAddresses = [...addresses];
     newAddresses[index].address = value;
     setAddresses(newAddresses);
-    // Clear error when user types
-    if (errors.addresses) {
-      setErrors((prev) => ({ ...prev, addresses: "" }));
+
+    // Real-time validation for address
+    const error = await validateAddress(value);
+    if (error) {
+      setErrors((prev) => ({ ...prev, addresses: error }));
+    } else {
+      // Check if all addresses are valid
+      const hasEmptyAddress = newAddresses.some(
+        (addr) => !addr.address.trim() || addr.address.trim().length < 10
+      );
+      if (hasEmptyAddress) {
+        setErrors((prev) => ({
+          ...prev,
+          addresses: "All addresses must be at least 10 characters",
+        }));
+      } else {
+        setErrors((prev) => ({ ...prev, addresses: "" }));
+      }
     }
   };
 
@@ -169,7 +209,7 @@ const SignupPage = () => {
               name="name"
               placeholder="Enter your full name"
               value={formData.name}
-              onChange={handleChange}
+              onChange={handleNameChange}
               error={errors.name}
               required
               autoComplete="name"
@@ -182,7 +222,7 @@ const SignupPage = () => {
               name="email"
               placeholder="Enter your email"
               value={formData.email}
-              onChange={handleChange}
+              onChange={handleEmailChange}
               error={errors.email}
               required
               autoComplete="email"
