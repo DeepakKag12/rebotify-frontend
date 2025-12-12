@@ -290,7 +290,7 @@ const MyCertificatesPage = () => {
                 {cert.uploadDocument && (
                   <div className="mb-4">
                     <a
-                      href={`${"http://localhost:3005"}/${cert.uploadDocument}`}
+                      href={`${import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || "http://localhost:3005"}/${cert.uploadDocument}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm text-purple-600 hover:text-purple-800 flex items-center"

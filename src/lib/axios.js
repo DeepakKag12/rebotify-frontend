@@ -38,7 +38,7 @@ axiosInstance.interceptors.response.use(
 // Helper function to get full image URL
 export const getImageUrl = (imagePath) => {
   if (!imagePath) return null;
-  const baseURL = "http://localhost:3005";
+  const baseURL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || "http://localhost:3005";
   // Remove leading slash if present to avoid double slashes
   const cleanPath = imagePath.startsWith("/") ? imagePath.slice(1) : imagePath;
   return `${baseURL}/${cleanPath}`;
