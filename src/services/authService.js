@@ -15,6 +15,11 @@ export const authAPI = {
     return data;
   },
 
+  loginWithOTP: async (credentials) => {
+    const { data } = await axiosInstance.post("/users/login-with-otp", credentials);
+    return data;
+  },
+
   verifyOTP: async (otpData) => {
     const { data } = await axiosInstance.post("/users/verify-otp", otpData);
     return data;
@@ -60,8 +65,22 @@ export const useSignup = () => {
 };
 
 export const useLogin = () => {
+  const setAuth = useAuthStore((state) => state.setAuth);
+
   return useMutation({
     mutationFn: authAPI.login,
+    onSuccess: (data) => {
+      // Direct login - set auth immediately
+      if (data.user && data.token) {
+        setAuth(data.user, data.token);
+      }
+    },
+  });
+};
+
+export const useLoginWithOTP = () => {
+  return useMutation({
+    mutationFn: authAPI.loginWithOTP,
     onSuccess: (data) => {
       // Login returns OTP requirement, not immediate auth
       // Actual auth happens in verifyOTP
