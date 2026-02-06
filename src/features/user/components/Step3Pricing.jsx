@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { IndianRupee, Sparkles, TrendingUp } from "lucide-react";
+import { DollarSign, Sparkles, TrendingUp, Truck, Lightbulb, AlertCircle } from "lucide-react";
 import Input from "../../../components/ui/input";
 import useListingStore from "../../../store/listingStore";
 import { validatePrice } from "../../../utils/validationSchemas";
@@ -65,7 +65,7 @@ const Step3Pricing = () => {
                 Based on market analysis and product condition
               </p>
               <div className="flex items-center gap-2 bg-white rounded-lg px-4 py-3">
-                <IndianRupee className="w-5 h-5 text-brand-green" />
+                <DollarSign className="w-5 h-5 text-brand-green" />
                 <span className="text-2xl font-bold text-gray-900">
                   {aiSuggestedPrice.min?.toLocaleString("en-IN")}
                 </span>
@@ -92,11 +92,11 @@ const Step3Pricing = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Expected Price */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Expected Price (₹)
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Expected Price ($)
             </label>
             <div className="relative">
-              <IndianRupee className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <DollarSign className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="number"
                 value={listingFormData.price}
@@ -151,7 +151,7 @@ const Step3Pricing = () => {
             <div className="flex items-center gap-2 text-gray-700">
               <TrendingUp className="w-5 h-5 text-brand-green" />
               <span className="font-medium">
-                Your asking price: ₹
+                Your asking price: $
                 {parseInt(listingFormData.price).toLocaleString("en-IN")}
               </span>
               {listingFormData.price_type === "negotiable" && (
@@ -219,8 +219,9 @@ const Step3Pricing = () => {
           >
             <div className="flex items-start justify-between">
               <div>
-                <h4 className="font-semibold text-gray-900 mb-1">
-                  📦 Delivery Available
+                <h4 className="font-semibold text-gray-900 mb-1 flex items-center gap-2">
+                  <Truck className="w-5 h-5 text-brand-green" />
+                  Delivery Available
                 </h4>
                 <p className="text-sm text-gray-600">
                   You'll arrange delivery to buyer
@@ -242,8 +243,9 @@ const Step3Pricing = () => {
         </div>
 
         {listingFormData.delivery_options.length === 0 && (
-          <p className="text-sm text-red-500">
-            ⚠️ Please select at least one delivery option
+          <p className="text-sm text-red-500 flex items-center gap-1">
+            <AlertCircle className="w-4 h-4" />
+            Please select at least one delivery option
           </p>
         )}
       </div>
@@ -251,7 +253,8 @@ const Step3Pricing = () => {
       {/* Pricing Tips */}
       <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
         <h4 className="font-semibold text-blue-900 mb-2 flex items-center gap-2">
-          💡 Pricing Tips
+          <Lightbulb className="w-5 h-5" />
+          Pricing Tips
         </h4>
         <ul className="text-sm text-blue-700 space-y-1">
           <li>• Research similar items to set a competitive price</li>

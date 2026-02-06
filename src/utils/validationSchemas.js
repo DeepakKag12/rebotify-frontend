@@ -157,6 +157,58 @@ export const modelSchema = yup
   );
 
 /**
+ * Battery health validation:
+ * - Minimum 1 character
+ * - Letters, numbers, spaces, %, commas, hyphens, and slashes allowed
+ * - No random special symbols
+ */
+export const batterySchema = yup
+  .string()
+  .trim()
+  .min(1, "Battery health must be at least 1 character")
+  .max(100, "Battery health must be less than 100 characters")
+  .test(
+    "no-special-chars",
+    "Battery health can only contain letters, numbers, spaces, %, commas, hyphens, and slashes",
+    (value) => {
+      if (!value) return true;
+      return /^[a-zA-Z0-9\s%,\/-]+$/.test(value);
+    }
+  );
+
+/**
+ * Video link validation (optional):
+ * - Must be a valid URL format
+ * - Accepts YouTube, Vimeo, Google Drive, Dropbox, and other video platforms
+ * - Empty value is allowed (optional field)
+ */
+export const videoLinkSchema = yup
+  .string()
+  .trim()
+  .test(
+    "is-url",
+    "Please enter a valid URL (e.g., https://youtube.com/...)",
+    (value) => {
+      if (!value) return true; // Allow empty
+      // Check if it's a valid URL format
+      try {
+        new URL(value);
+        return /^https?:\/\/.+/.test(value);
+      } catch {
+        return false;
+      }
+    }
+  )
+  .test(
+    "starts-with-protocol",
+    "URL must start with http:// or https://",
+    (value) => {
+      if (!value) return true;
+      return /^https?:\/\//.test(value);
+    }
+  );
+
+/**
  * Year validation:
  * - Must be a valid year
  * - Between 1990 and current year
@@ -395,6 +447,20 @@ export const validateBrand = async (value) => {
  */
 export const validateModel = async (value) => {
   return validateField("model", value, modelSchema);
+};
+
+/**
+ * Validate battery health field in real-time
+ */
+export const validateBattery = async (value) => {
+  return validateField("battery", value, batterySchema);
+};
+
+/**
+ * Validate video link field in real-time
+ */
+export const validateVideoLink = async (value) => {
+  return validateField("video_link", value, videoLinkSchema);
 };
 
 /**

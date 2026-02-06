@@ -125,7 +125,7 @@ const CreateListingPage = () => {
 
     createListing(formData, {
       onSuccess: (data) => {
-        toast.success("Listing created successfully! 🎉");
+        toast.success("Listing created successfully!");
         resetListingForm();
         setTimeout(() => {
           navigate("/user/dashboard");

@@ -496,7 +496,7 @@ const DeliveryDetailsPage = () => {
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder="Add any notes about this status update..."
                     rows={4}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900"
                   />
                 </div>
 

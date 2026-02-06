@@ -1,4 +1,4 @@
-import Navbar from '../components/Navbar'
+import ResizableLandingNavbar from '../components/ResizableLandingNavbar'
 import HeroSection from '../sections/HeroSection'
 import HowItWorks from '../sections/HowItWorks'
 import WhyChooseUs from '../sections/WhyChooseUs'
@@ -10,15 +10,17 @@ import Footer from '../sections/Footer'
 
 const LandingPage = () => {
   return (
-    <div className="min-h-screen">
-      <Navbar />
-      <HeroSection />
-      <HowItWorks />
-      <WhyChooseUs />
-      <Services />
-      <Statistics />
-      <Testimonials />
-      <CTASection />
+    <div className="min-h-screen scroll-smooth">
+      <ResizableLandingNavbar />
+      <main>
+        <HeroSection />
+        <HowItWorks />
+        <WhyChooseUs />
+        <Services />
+        <Statistics />
+        <Testimonials />
+        <CTASection />
+      </main>
       <Footer />
     </div>
   )

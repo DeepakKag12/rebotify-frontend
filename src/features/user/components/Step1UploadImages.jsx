@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, Loader2, AlertCircle } from "lucide-react";
+import { Sparkles, Loader2, AlertCircle, CheckCircle } from "lucide-react";
 import { toast } from "react-toastify";
 import ImageUpload from "./ImageUpload";
 import useListingStore from "../../../store/listingStore";
@@ -32,7 +32,7 @@ const Step1UploadImages = ({ isEditMode = false }) => {
     analyzeImages(formData, {
       onSuccess: (data) => {
         if (data.success) {
-          toast.success("AI Analysis completed! Form auto-filled ✨");
+          toast.success("AI Analysis completed! Form auto-filled");
           setHasAnalyzed(true);
         } else {
           toast.error(data.message || "AI Analysis failed");
@@ -104,7 +104,7 @@ const Step1UploadImages = ({ isEditMode = false }) => {
             ) : hasAnalyzed ? (
               <>
                 <Sparkles className="w-6 h-6" />
-                Analysis Complete ✓
+                <span className="flex items-center gap-2">Analysis Complete <CheckCircle className="w-5 h-5" /></span>
               </>
             ) : (
               <>
@@ -176,7 +176,7 @@ const Step1UploadImages = ({ isEditMode = false }) => {
                 <div className="bg-white rounded-lg p-3">
                   <p className="text-xs text-gray-500 mb-1">Estimated Price</p>
                   <p className="font-medium text-gray-900">
-                    ₹{analysisResult.analysis.estimated_price_range.min} - ₹
+                    ${analysisResult.analysis.estimated_price_range.min} - $
                     {analysisResult.analysis.estimated_price_range.max}
                   </p>
                 </div>

@@ -8,14 +8,13 @@ import PasswordInput from "../../../components/ui/password-input";
 import Checkbox from "../../../components/ui/checkbox";
 import { Button } from "../../../components/ui/button";
 import OTPModal from "../../../components/ui/otp-modal";
-import { useLogin, useLoginWithOTP, useVerifyOTP } from "../../../services/authService";
+import { useLogin, useVerifyOTP } from "../../../services/authService";
 import useAuthStore from "../../../store/authStore";
 import { validateEmail } from "../../../utils/validationSchemas";
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const { mutate: login, isPending: isLoginPending } = useLogin();
-  const { mutate: loginWithOTP, isPending: isLoginWithOTPPending } = useLoginWithOTP();
   const { mutate: verifyOTP, isPending: isVerifyPending } = useVerifyOTP();
 
   const { otpSession, setOTPSession, clearOTPSession } = useAuthStore();
@@ -28,7 +27,6 @@ const LoginPage = () => {
 
   const [errors, setErrors] = useState({});
   const [otpModalOpen, setOtpModalOpen] = useState(false);
-  const [loginMethod, setLoginMethod] = useState("password"); // "password" or "otp"
 
   // Check for existing OTP session on component mount
   useEffect(() => {
@@ -87,48 +85,33 @@ const LoginPage = () => {
 
     if (!validateForm()) return;
 
-    if (loginMethod === "password") {
-      // Direct password login
-      login(
-        { email: formData.email, password: formData.password },
-        {
-          onSuccess: (data) => {
+    login(
+      { email: formData.email, password: formData.password },
+      {
+        onSuccess: (data) => {
+          if (data.requireOTP) {
+            // OTP required - save session and open modal
+            const otpSessionData = {
+              userId: data.userId,
+              email: data.email,
+              expiresAt: data.expiresAt,
+            };
+            setOTPSession(otpSessionData);
+            setOtpModalOpen(true);
+            toast.info("OTP sent to your email");
+          } else {
+            // Direct login (shouldn't happen with OTP enabled, but keeping for safety)
             toast.success("Login successful! Redirecting...");
             redirectToDashboard(data.user.userType);
-          },
-          onError: (error) => {
-            toast.error(
-              error.response?.data?.message || "Login failed. Please try again."
-            );
-          },
-        }
-      );
-    } else {
-      // OTP-based login
-      loginWithOTP(
-        { email: formData.email, password: formData.password },
-        {
-          onSuccess: (data) => {
-            if (data.requireOTP) {
-              // OTP required - save session and open modal
-              const otpSessionData = {
-                userId: data.userId,
-                email: data.email,
-                expiresAt: data.expiresAt,
-              };
-              setOTPSession(otpSessionData);
-              setOtpModalOpen(true);
-              toast.info("OTP sent to your email");
-            }
-          },
-          onError: (error) => {
-            toast.error(
-              error.response?.data?.message || "Login failed. Please try again."
-            );
-          },
-        }
-      );
-    }
+          }
+        },
+        onError: (error) => {
+          toast.error(
+            error.response?.data?.message || "Login failed. Please try again."
+          );
+        },
+      }
+    );
   };
 
   const handleVerifyOTP = (otp) => {
@@ -218,44 +201,8 @@ const LoginPage = () => {
             </p>
           </div>
 
-          {/* Login Method Toggle */}
-          <div className="mb-6 p-1 bg-gray-100 rounded-lg flex">
-            <button
-              type="button"
-              onClick={() => setLoginMethod("password")}
-              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
-                loginMethod === "password"
-                  ? "bg-white text-brand-green shadow-sm"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
-            >
-              Password Login
-            </button>
-            <button
-              type="button"
-              onClick={() => setLoginMethod("otp")}
-              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
-                loginMethod === "otp"
-                  ? "bg-white text-brand-green shadow-sm"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
-            >
-              OTP Login
-            </button>
-          </div>
-
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-5">{loginMethod === "password" && (
-              <p className="text-sm text-gray-500 mb-4">
-                Login instantly with your password
-              </p>
-            )}
-            {loginMethod === "otp" && (
-              <p className="text-sm text-gray-500 mb-4">
-                We'll send a verification code to your email
-              </p>
-            )}
-
+          <form onSubmit={handleSubmit} className="space-y-5">
             <Input
               label="Email Address"
               type="email"
@@ -298,16 +245,16 @@ const LoginPage = () => {
 
             <Button
               type="submit"
-              disabled={isLoginPending || isLoginWithOTPPending}
+              disabled={isLoginPending}
               className="w-full h-11 bg-brand-green hover:bg-brand-green-dark text-white font-medium rounded-lg transition-all duration-200"
             >
-              {(isLoginPending || isLoginWithOTPPending) ? (
+              {isLoginPending ? (
                 <>
                   <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  {loginMethod === "otp" ? "Sending OTP..." : "Signing in..."}
+                  Signing in...
                 </>
               ) : (
-                loginMethod === "otp" ? "Send OTP & Sign In" : "Sign In"
+                "Sign In"
               )}
             </Button>
 

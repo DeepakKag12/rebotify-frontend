@@ -50,6 +50,46 @@ export const bidAPI = {
     const { data } = await axiosInstance.post("/bids/close", closeData);
     return data;
   },
+
+  // Buyer accepts deal (NEW - Payment Workflow)
+  buyerAcceptDeal: async (listingId) => {
+    const { data } = await axiosInstance.post(`/bids/${listingId}/buyer-accept`);
+    return data;
+  },
+
+  // Get bid status (NEW - Payment Workflow)
+  getBidStatus: async (listingId) => {
+    const { data } = await axiosInstance.get(`/bids/${listingId}/status`);
+    return data;
+  },
+
+  // Create Stripe Checkout Session (NEW - Stripe Redirect Payment)
+  createStripeCheckoutSession: async (listingId) => {
+    const { data } = await axiosInstance.post(`/bids/${listingId}/stripe/create-checkout-session`);
+    return data;
+  },
+
+  // Verify Stripe Checkout Session (NEW - Stripe Redirect Payment)
+  verifyStripeCheckout: async (listingId, sessionId) => {
+    const { data } = await axiosInstance.post(`/bids/${listingId}/stripe/verify-checkout`, {
+      session_id: sessionId,
+    });
+    return data;
+  },
+
+  // Create Stripe Payment Intent (NEW - Stripe Payment)
+  createStripePaymentIntent: async (listingId) => {
+    const { data } = await axiosInstance.post(`/bids/${listingId}/stripe/create-payment-intent`);
+    return data;
+  },
+
+  // Verify Stripe Payment (NEW - Stripe Payment)
+  verifyStripePayment: async (listingId, paymentIntentId) => {
+    const { data } = await axiosInstance.post(`/bids/${listingId}/stripe/verify-payment`, {
+      payment_intent_id: paymentIntentId,
+    });
+    return data;
+  },
 };
 
 // React Query Hooks
@@ -112,8 +152,7 @@ export const useSelectBuyer = () => {
       queryClient.invalidateQueries({ queryKey: ["bids"] });
       queryClient.invalidateQueries({ queryKey: ["listings"] });
       queryClient.invalidateQueries({ queryKey: ["seller-listings"] });
-      queryClient.invalidateQueries({ queryKey: ["transactions"] }); // Invalidate transactions to show receipt
-      queryClient.invalidateQueries({ queryKey: ["deliveries"] }); // Invalidate deliveries to show new delivery
+      // Note: Don't invalidate transactions/deliveries here - they don't exist until payment
     },
   });
 };
@@ -135,6 +174,52 @@ export const useCloseAuction = () => {
     mutationFn: bidAPI.closeAuction,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bids"] });
+      queryClient.invalidateQueries({ queryKey: ["listings"] });
+    },
+  });
+};
+
+// Buyer accept deal (NEW - Payment Workflow)
+export const useBuyerAcceptDeal = () => {
+  return useMutation({
+    mutationFn: bidAPI.buyerAcceptDeal,
+    onSuccess: (data, listingId) => {
+      queryClient.invalidateQueries({ queryKey: ["bids", "listing", listingId] });
+      queryClient.invalidateQueries({ queryKey: ["bids", "status", listingId] });
+      queryClient.invalidateQueries({ queryKey: ["bids", "user-history"] });
+      queryClient.invalidateQueries({ queryKey: ["listings"] });
+    },
+  });
+};
+
+// Get bid status (NEW - Payment Workflow)
+export const useGetBidStatus = (listingId) => {
+  return useQuery({
+    queryKey: ["bids", "status", listingId],
+    queryFn: () => bidAPI.getBidStatus(listingId),
+    enabled: !!listingId,
+    staleTime: 10000, // 10 seconds
+  });
+};
+
+// Create Stripe Payment Intent (NEW - Stripe Payment)
+export const useCreateStripePaymentIntent = () => {
+  return useMutation({
+    mutationFn: bidAPI.createStripePaymentIntent,
+  });
+};
+
+// Verify Stripe Payment (NEW - Stripe Payment)
+export const useVerifyStripePayment = () => {
+  return useMutation({
+    mutationFn: ({ listingId, paymentIntentId }) => 
+      bidAPI.verifyStripePayment(listingId, paymentIntentId),
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["bids", "listing", variables.listingId] });
+      queryClient.invalidateQueries({ queryKey: ["bids", "status", variables.listingId] });
+      queryClient.invalidateQueries({ queryKey: ["bids", "user-history"] });
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["deliveries"] });
       queryClient.invalidateQueries({ queryKey: ["listings"] });
     },
   });

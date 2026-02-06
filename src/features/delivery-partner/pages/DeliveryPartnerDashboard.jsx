@@ -12,8 +12,10 @@ import DashboardNavbar from "../../../shared/components/DashboardNavbar";
 import useAuthStore from "../../../store/authStore";
 import { useGetAllDeliveries } from "../../../services/deliveryService";
 import DeliveryCard from "../components/DeliveryCard";
+import StatusUpdateModal from "../components/StatusUpdateModal";
 import { toast } from "react-toastify";
 import { useUpdateDeliveryStatus } from "../../../services/deliveryService";
+import { useState } from "react";
 
 const DeliveryPartnerDashboard = () => {
   const { user } = useAuthStore();
@@ -21,6 +23,10 @@ const DeliveryPartnerDashboard = () => {
   const { data: deliveriesData, isLoading } = useGetAllDeliveries();
   const { mutate: updateStatus, isPending: isUpdating } =
     useUpdateDeliveryStatus();
+
+  // State for status update modal
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [pendingStatusUpdate, setPendingStatusUpdate] = useState(null);
 
   const deliveries = deliveriesData?.DeliveryData || [];
 
@@ -76,20 +82,25 @@ const DeliveryPartnerDashboard = () => {
     },
   ];
 
-  const handleStatusUpdate = (deliveryId, newStatus) => {
-    if (
-      window.confirm(`Are you sure you want to update the delivery status?`)
-    ) {
+  const handleStatusUpdate = (deliveryId, newStatus, currentStatus) => {
+    setPendingStatusUpdate({ deliveryId, newStatus, currentStatus });
+    setShowStatusModal(true);
+  };
+
+  const confirmStatusUpdate = () => {
+    if (pendingStatusUpdate) {
       updateStatus(
-        { deliveryId, status: newStatus },
+        { deliveryId: pendingStatusUpdate.deliveryId, status: pendingStatusUpdate.newStatus },
         {
           onSuccess: () => {
             toast.success("Delivery status updated successfully!");
+            setPendingStatusUpdate(null);
           },
           onError: (error) => {
             toast.error(
               error.response?.data?.message || "Failed to update status"
             );
+            setPendingStatusUpdate(null);
           },
         }
       );
@@ -229,6 +240,18 @@ const DeliveryPartnerDashboard = () => {
           )}
         </motion.div>
       </div>
+
+      {/* Status Update Modal */}
+      <StatusUpdateModal
+        isOpen={showStatusModal}
+        onClose={() => {
+          setShowStatusModal(false);
+          setPendingStatusUpdate(null);
+        }}
+        onConfirm={confirmStatusUpdate}
+        currentStatus={pendingStatusUpdate?.currentStatus}
+        newStatus={pendingStatusUpdate?.newStatus}
+      />
     </div>
   );
 };

@@ -173,7 +173,7 @@ const EditListingPage = () => {
       { listingId, formData },
       {
         onSuccess: (data) => {
-          toast.success("Listing updated successfully! 🎉");
+          toast.success("Listing updated successfully!");
           resetListingForm();
           setTimeout(() => {
             navigate(`/user/listings/${listingId}`);

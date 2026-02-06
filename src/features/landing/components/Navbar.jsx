@@ -76,7 +76,7 @@ const Navbar = () => {
               className="flex items-center cursor-pointer"
             >
               <span className="text-2xl font-bold text-brand-green">
-                E-Waste<span className="text-brand-olive">Hub</span>
+                Re<span className="text-brand-olive">bot</span>
               </span>
             </motion.div>
           </Link>

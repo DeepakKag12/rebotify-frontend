@@ -18,6 +18,7 @@ import DeliveryPartnerProfilePage from "./features/delivery-partner/pages/Delive
 import AdminDashboard from "./features/admin/pages/AdminDashboard";
 import UserManagementPage from "./features/admin/pages/UserManagementPage";
 import CertificateManagementPage from "./features/admin/pages/CertificateManagementPage";
+import AdminProfilePage from "./features/admin/pages/AdminProfilePage";
 
 // User Pages
 import CreateListingPage from "./features/user/pages/CreateListingPage";
@@ -31,6 +32,7 @@ import RecyclerListingsPage from "./features/recycler/pages/RecyclerListingsPage
 import MyBidsPage from "./features/recycler/pages/MyBidsPage";
 import RecyclerProfilePage from "./features/recycler/pages/RecyclerProfilePage";
 import MyCertificatesPage from "./features/recycler/pages/MyCertificatesPage";
+import PaymentSuccessPage from "./features/recycler/pages/PaymentSuccessPage";
 
 // Components
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -156,6 +158,14 @@ function App() {
         }
       />
       <Route
+        path="/payment/success"
+        element={
+          <ProtectedRoute allowedRoles={["recycler"]}>
+            <PaymentSuccessPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/recycler/profile"
         element={
           <ProtectedRoute allowedRoles={["recycler"]}>
@@ -228,6 +238,14 @@ function App() {
         element={
           <ProtectedRoute allowedRoles={["admin"]}>
             <CertificateManagementPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/profile"
+        element={
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <AdminProfilePage />
           </ProtectedRoute>
         }
       />

@@ -9,6 +9,7 @@ import { Card } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
 import Input from "../../../components/ui/input";
 import DashboardNavbar from "../../../shared/components/DashboardNavbar";
+import { toast } from "react-toastify";
 
 const MyCertificatesPage = () => {
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
@@ -21,59 +22,237 @@ const MyCertificatesPage = () => {
     validityPeriod: "",
     uploadDocument: null,
   });
+  const [errors, setErrors] = useState({});
 
   const { data: certificates, isLoading } = useMyCertificates();
   const uploadMutation = useUploadCertificate();
   const deleteMutation = useDeleteCertificate();
   const updateMutation = useUpdateCertificate();
 
+  const navItems = [
+    { label: "Dashboard", path: "/recycler/dashboard" },
+    { label: "Browse Listings", path: "/recycler/listings" },
+    { label: "My Bids", path: "/recycler/bids" },
+    { label: "Certificates", path: "/recycler/certificates" },
+  ];
+
+  // Validation functions
+  const validateDocumentType = (value) => {
+    if (!value || value.trim().length === 0) {
+      return "Document type is required";
+    }
+    if (value.trim().length < 3) {
+      return "Document type must be at least 3 characters";
+    }
+    if (value.trim().length > 100) {
+      return "Document type must be less than 100 characters";
+    }
+    // Only allow letters, numbers, spaces, hyphens, and common punctuation
+    if (!/^[a-zA-Z0-9\s\-,.'()&]+$/.test(value)) {
+      return "Document type can only contain letters, numbers, spaces, hyphens, and basic punctuation";
+    }
+    // Must contain at least 2 letters (not just symbols/numbers)
+    const letterCount = (value.match(/[a-zA-Z]/g) || []).length;
+    if (letterCount < 2) {
+      return "Document type must contain at least 2 letters";
+    }
+    // Check if it's mostly symbols or repeated characters
+    if (/^[.\-_,;:!@#$%^&*()+=]+$/.test(value.trim())) {
+      return "Document type cannot be only symbols";
+    }
+    return null;
+  };
+
+  const validateCertificateNumber = (value) => {
+    if (!value || value.trim().length === 0) {
+      return "Certificate number is required";
+    }
+    if (value.trim().length < 3) {
+      return "Certificate number must be at least 3 characters";
+    }
+    if (value.trim().length > 50) {
+      return "Certificate number must be less than 50 characters";
+    }
+    // Allow alphanumeric, hyphens, slashes, and underscores (common in certificate numbers)
+    if (!/^[a-zA-Z0-9\-/_]+$/.test(value)) {
+      return "Certificate number can only contain letters, numbers, hyphens, slashes, and underscores";
+    }
+    // Must contain at least one letter or number (not just symbols)
+    if (!/[a-zA-Z0-9]/.test(value)) {
+      return "Certificate number must contain at least one letter or number";
+    }
+    // Check if it's only symbols
+    if (/^[\-/_]+$/.test(value.trim())) {
+      return "Certificate number cannot be only symbols";
+    }
+    return null;
+  };
+
+  const validateIssuingAuthority = (value) => {
+    if (!value || value.trim().length === 0) {
+      return "Issuing authority is required";
+    }
+    if (value.trim().length < 3) {
+      return "Issuing authority must be at least 3 characters";
+    }
+    if (value.trim().length > 150) {
+      return "Issuing authority must be less than 150 characters";
+    }
+    // Allow letters, numbers, spaces, and common punctuation for organization names
+    if (!/^[a-zA-Z0-9\s\-,.'()&]+$/.test(value)) {
+      return "Issuing authority can only contain letters, numbers, spaces, and basic punctuation";
+    }
+    // Must contain at least 3 letters (not just symbols/numbers)
+    const letterCount = (value.match(/[a-zA-Z]/g) || []).length;
+    if (letterCount < 3) {
+      return "Issuing authority must contain at least 3 letters";
+    }
+    // Check if it's mostly symbols or repeated characters
+    if (/^[.\-_,;:!@#$%^&*()+=]+$/.test(value.trim())) {
+      return "Issuing authority cannot be only symbols";
+    }
+    return null;
+  };
+
+  const validateValidityPeriod = (value) => {
+    if (!value) {
+      return "Validity period is required";
+    }
+    const selectedDate = new Date(value);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    if (selectedDate < today) {
+      return "Validity period cannot be in the past";
+    }
+    return null;
+  };
+
+  const validateFile = (file) => {
+    if (!file) {
+      return "Please upload a document";
+    }
+    
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+    if (!allowedTypes.includes(file.type)) {
+      return "Only PDF, JPG, and PNG files are allowed";
+    }
+    
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      return "File size must be less than 5MB";
+    }
+    
+    return null;
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    
+    // Real-time validation
+    let error = null;
+    switch (name) {
+      case "documentType":
+        error = validateDocumentType(value);
+        break;
+      case "certificateNumber":
+        error = validateCertificateNumber(value);
+        break;
+      case "issuingAuthority":
+        error = validateIssuingAuthority(value);
+        break;
+      case "validityPeriod":
+        error = validateValidityPeriod(value);
+        break;
+    }
+    
+    setErrors((prev) => ({ ...prev, [name]: error }));
   };
 
   const handleFileChange = (e) => {
-    setFormData((prev) => ({ ...prev, uploadDocument: e.target.files[0] }));
+    const file = e.target.files[0];
+    setFormData((prev) => ({ ...prev, uploadDocument: file }));
+    
+    // Validate file
+    const error = validateFile(file);
+    setErrors((prev) => ({ ...prev, uploadDocument: error }));
   };
 
   const handleUploadSubmit = async (e) => {
     e.preventDefault();
 
-    if (
-      !formData.documentType ||
-      !formData.certificateNumber ||
-      !formData.issuingAuthority ||
-      !formData.validityPeriod ||
-      !formData.uploadDocument
-    ) {
-      alert("Please fill all required fields");
+    // Validate all fields
+    const documentTypeError = validateDocumentType(formData.documentType);
+    const certificateNumberError = validateCertificateNumber(formData.certificateNumber);
+    const issuingAuthorityError = validateIssuingAuthority(formData.issuingAuthority);
+    const validityPeriodError = validateValidityPeriod(formData.validityPeriod);
+    const fileError = validateFile(formData.uploadDocument);
+
+    const newErrors = {
+      documentType: documentTypeError,
+      certificateNumber: certificateNumberError,
+      issuingAuthority: issuingAuthorityError,
+      validityPeriod: validityPeriodError,
+      uploadDocument: fileError,
+    };
+
+    setErrors(newErrors);
+
+    // Check if there are any errors
+    if (Object.values(newErrors).some((error) => error !== null)) {
+      toast.error("Please fix all validation errors before submitting");
       return;
     }
 
     const data = new FormData();
-    data.append("documentType", formData.documentType);
-    data.append("certificateNumber", formData.certificateNumber);
-    data.append("issuingAuthority", formData.issuingAuthority);
+    data.append("documentType", formData.documentType.trim());
+    data.append("certificateNumber", formData.certificateNumber.trim());
+    data.append("issuingAuthority", formData.issuingAuthority.trim());
     data.append("validityPeriod", formData.validityPeriod);
     data.append("uploadDocument", formData.uploadDocument);
 
     try {
       await uploadMutation.mutateAsync(data);
+      toast.success("Certificate uploaded successfully!");
       setUploadModalOpen(false);
       resetForm();
     } catch (error) {
       console.error("Failed to upload certificate:", error);
-      alert(error.response?.data?.message || "Failed to upload certificate");
+      toast.error(error.response?.data?.message || "Failed to upload certificate");
     }
   };
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
 
+    // Validate all fields except file (which is optional in edit)
+    const documentTypeError = validateDocumentType(formData.documentType);
+    const certificateNumberError = validateCertificateNumber(formData.certificateNumber);
+    const issuingAuthorityError = validateIssuingAuthority(formData.issuingAuthority);
+    const validityPeriodError = validateValidityPeriod(formData.validityPeriod);
+    const fileError = formData.uploadDocument ? validateFile(formData.uploadDocument) : null;
+
+    const newErrors = {
+      documentType: documentTypeError,
+      certificateNumber: certificateNumberError,
+      issuingAuthority: issuingAuthorityError,
+      validityPeriod: validityPeriodError,
+      uploadDocument: fileError,
+    };
+
+    setErrors(newErrors);
+
+    // Check if there are any errors
+    if (Object.values(newErrors).some((error) => error !== null)) {
+      toast.error("Please fix all validation errors before submitting");
+      return;
+    }
+
     const data = new FormData();
-    data.append("documentType", formData.documentType);
-    data.append("certificateNumber", formData.certificateNumber);
-    data.append("issuingAuthority", formData.issuingAuthority);
+    data.append("documentType", formData.documentType.trim());
+    data.append("certificateNumber", formData.certificateNumber.trim());
+    data.append("issuingAuthority", formData.issuingAuthority.trim());
     data.append("validityPeriod", formData.validityPeriod);
     if (formData.uploadDocument) {
       data.append("uploadDocument", formData.uploadDocument);
@@ -84,12 +263,13 @@ const MyCertificatesPage = () => {
         certificateId: selectedCertificate._id,
         formData: data,
       });
+      toast.success("Certificate updated successfully!");
       setEditModalOpen(false);
       setSelectedCertificate(null);
       resetForm();
     } catch (error) {
       console.error("Failed to update certificate:", error);
-      alert(error.response?.data?.message || "Failed to update certificate");
+      toast.error(error.response?.data?.message || "Failed to update certificate");
     }
   };
 
@@ -100,9 +280,10 @@ const MyCertificatesPage = () => {
 
     try {
       await deleteMutation.mutateAsync(certificateId);
+      toast.success("Certificate deleted successfully!");
     } catch (error) {
       console.error("Failed to delete certificate:", error);
-      alert(error.response?.data?.message || "Failed to delete certificate");
+      toast.error(error.response?.data?.message || "Failed to delete certificate");
     }
   };
 
@@ -128,6 +309,7 @@ const MyCertificatesPage = () => {
       validityPeriod: "",
       uploadDocument: null,
     });
+    setErrors({});
   };
 
   const getStatusBadge = (status) => {
@@ -149,7 +331,7 @@ const MyCertificatesPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <DashboardNavbar />
+      <DashboardNavbar navItems={navItems} />
 
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
@@ -164,7 +346,7 @@ const MyCertificatesPage = () => {
           </div>
           <Button
             onClick={() => setUploadModalOpen(true)}
-            className="bg-purple-600 hover:bg-purple-700"
+            className="bg-green-600 hover:bg-green-700"
           >
             <svg
               className="h-5 w-5 mr-2"
@@ -239,7 +421,7 @@ const MyCertificatesPage = () => {
             </p>
             <Button
               onClick={() => setUploadModalOpen(true)}
-              className="bg-purple-600 hover:bg-purple-700"
+              className="bg-green-600 hover:bg-green-700"
             >
               Upload Certificate
             </Button>
@@ -290,10 +472,10 @@ const MyCertificatesPage = () => {
                 {cert.uploadDocument && (
                   <div className="mb-4">
                     <a
-                      href={`${import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || "http://localhost:3005"}/${cert.uploadDocument}`}
+                      href={`${"http://localhost:3005"}/${cert.uploadDocument}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm text-purple-600 hover:text-purple-800 flex items-center"
+                      className="text-sm text-green-600 hover:text-green-800 flex items-center"
                     >
                       <svg
                         className="h-4 w-4 mr-1"
@@ -384,6 +566,9 @@ const MyCertificatesPage = () => {
                     placeholder="e.g., Recycling License"
                     required
                   />
+                  {errors.documentType && (
+                    <p className="text-red-500 text-xs mt-1">{errors.documentType}</p>
+                  )}
                 </div>
 
                 <div>
@@ -398,6 +583,9 @@ const MyCertificatesPage = () => {
                     placeholder="e.g., REC-2024-001"
                     required
                   />
+                  {errors.certificateNumber && (
+                    <p className="text-red-500 text-xs mt-1">{errors.certificateNumber}</p>
+                  )}
                 </div>
 
                 <div>
@@ -412,6 +600,9 @@ const MyCertificatesPage = () => {
                     placeholder="e.g., Environmental Protection Agency"
                     required
                   />
+                  {errors.issuingAuthority && (
+                    <p className="text-red-500 text-xs mt-1">{errors.issuingAuthority}</p>
+                  )}
                 </div>
 
                 <div>
@@ -426,6 +617,9 @@ const MyCertificatesPage = () => {
                     min={new Date().toISOString().split("T")[0]}
                     required
                   />
+                  {errors.validityPeriod && (
+                    <p className="text-red-500 text-xs mt-1">{errors.validityPeriod}</p>
+                  )}
                 </div>
 
                 <div>
@@ -436,9 +630,12 @@ const MyCertificatesPage = () => {
                     type="file"
                     onChange={handleFileChange}
                     accept=".pdf,.jpg,.jpeg,.png"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white text-gray-900"
                     required
                   />
+                  {errors.uploadDocument && (
+                    <p className="text-red-500 text-xs mt-1">{errors.uploadDocument}</p>
+                  )}
                   <p className="text-xs text-gray-500 mt-1">
                     Accepted formats: PDF, JPG, PNG (Max 5MB)
                   </p>
@@ -457,7 +654,7 @@ const MyCertificatesPage = () => {
                   </Button>
                   <Button
                     type="submit"
-                    className="bg-purple-600 hover:bg-purple-700"
+                    className="bg-green-600 hover:bg-green-700"
                     disabled={uploadMutation.isPending}
                   >
                     {uploadMutation.isPending ? "Uploading..." : "Upload"}
@@ -514,6 +711,9 @@ const MyCertificatesPage = () => {
                     onChange={handleInputChange}
                     required
                   />
+                  {errors.documentType && (
+                    <p className="text-red-500 text-xs mt-1">{errors.documentType}</p>
+                  )}
                 </div>
 
                 <div>
@@ -527,6 +727,9 @@ const MyCertificatesPage = () => {
                     onChange={handleInputChange}
                     required
                   />
+                  {errors.certificateNumber && (
+                    <p className="text-red-500 text-xs mt-1">{errors.certificateNumber}</p>
+                  )}
                 </div>
 
                 <div>
@@ -540,6 +743,9 @@ const MyCertificatesPage = () => {
                     onChange={handleInputChange}
                     required
                   />
+                  {errors.issuingAuthority && (
+                    <p className="text-red-500 text-xs mt-1">{errors.issuingAuthority}</p>
+                  )}
                 </div>
 
                 <div>
@@ -554,6 +760,9 @@ const MyCertificatesPage = () => {
                     min={new Date().toISOString().split("T")[0]}
                     required
                   />
+                  {errors.validityPeriod && (
+                    <p className="text-red-500 text-xs mt-1">{errors.validityPeriod}</p>
+                  )}
                 </div>
 
                 <div>
@@ -564,8 +773,11 @@ const MyCertificatesPage = () => {
                     type="file"
                     onChange={handleFileChange}
                     accept=".pdf,.jpg,.jpeg,.png"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white text-gray-900"
                   />
+                  {errors.uploadDocument && (
+                    <p className="text-red-500 text-xs mt-1">{errors.uploadDocument}</p>
+                  )}
                   <p className="text-xs text-gray-500 mt-1">
                     Leave empty to keep existing document
                   </p>
@@ -585,7 +797,7 @@ const MyCertificatesPage = () => {
                   </Button>
                   <Button
                     type="submit"
-                    className="bg-purple-600 hover:bg-purple-700"
+                    className="bg-green-600 hover:bg-green-700"
                     disabled={updateMutation.isPending}
                   >
                     {updateMutation.isPending ? "Updating..." : "Update"}

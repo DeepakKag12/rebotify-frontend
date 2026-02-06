@@ -74,7 +74,7 @@ const ListingDetailsPage = () => {
       {
         onSuccess: () => {
           toast.success(
-            "🎉 Buyer selected successfully! The listing is now closed and delivery has been scheduled."
+            "✅ Winner selected successfully! The buyer will receive a notification to proceed with payment."
           );
           setShowConfirmModal(false);
           setSelectedBidder(null);
@@ -433,7 +433,7 @@ const ListingDetailsPage = () => {
               <div className="flex items-center gap-2 mb-2">
                 <DollarSign className="w-5 h-5 text-brand-green" />
                 <span className="text-3xl font-bold text-gray-900">
-                  ₹{listing.price?.toLocaleString()}
+                  ${listing.price?.toLocaleString()}
                 </span>
               </div>
               <p className="text-sm text-gray-600 capitalize">
@@ -443,13 +443,13 @@ const ListingDetailsPage = () => {
               <div className="mt-4 pt-4 border-t border-gray-200">
                 <p className="text-sm text-gray-500 mb-2">Delivery Options</p>
                 <div className="space-y-2">
-                  {listing.delivery?.map((option, index) => (
+                  {listing.delivery_options?.split(',').map((option, index) => (
                     <div
                       key={index}
                       className="flex items-center gap-2 text-sm text-gray-700"
                     >
                       <CheckCircle className="w-4 h-4 text-brand-green" />
-                      <span className="capitalize">{option}</span>
+                      <span className="capitalize">{option.trim()}</span>
                     </div>
                   ))}
                 </div>
@@ -621,10 +621,10 @@ const ListingDetailsPage = () => {
                   What happens next:
                 </h4>
                 <ul className="text-sm text-blue-800 space-y-1">
-                  <li>✓ Receipt will be generated automatically</li>
-                  <li>✓ Delivery will be scheduled</li>
-                  <li>✓ Listing will be marked as closed</li>
-                  <li>✓ Both parties will be notified</li>
+                  <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4" /> Buyer will be notified to proceed with payment</li>
+                  <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4" /> After payment, receipt will be generated</li>
+                  <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4" /> Delivery will be scheduled automatically</li>
+                  <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4" /> You'll receive payment confirmation via email</li>
                 </ul>
               </div>
 

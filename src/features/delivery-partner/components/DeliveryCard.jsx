@@ -145,7 +145,7 @@ const DeliveryCard = ({ delivery, onStatusUpdate }) => {
 
           {nextStatus && (
             <button
-              onClick={() => onStatusUpdate(delivery._id, nextStatus)}
+              onClick={() => onStatusUpdate(delivery._id, nextStatus, delivery.status_delivery)}
               className="flex-1 px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium"
             >
               {getNextStatusLabel(delivery.status_delivery)}

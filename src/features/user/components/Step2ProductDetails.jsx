@@ -8,6 +8,8 @@ import {
   validateModel,
   validateYear,
   validateDescription,
+  validateBattery,
+  validateVideoLink,
 } from "../../../utils/validationSchemas";
 
 const Step2ProductDetails = () => {
@@ -84,6 +86,20 @@ const Step2ProductDetails = () => {
     handleChange("description", value);
     const error = await validateDescription(value);
     setErrors((prev) => ({ ...prev, description: error }));
+  };
+
+  const handleBatteryChange = async (e) => {
+    const { value } = e.target;
+    handleChange("battery", value);
+    const error = await validateBattery(value);
+    setErrors((prev) => ({ ...prev, battery: error }));
+  };
+
+  const handleVideoLinkChange = async (e) => {
+    const { value } = e.target;
+    handleChange("video_link", value);
+    const error = await validateVideoLink(value);
+    setErrors((prev) => ({ ...prev, video_link: error }));
   };
 
   const toggleAccessory = (accessory) => {
@@ -289,7 +305,8 @@ const Step2ProductDetails = () => {
           type="text"
           placeholder="e.g., 85%, Good, Replaced"
           value={listingFormData.battery}
-          onChange={(e) => handleChange("battery", e.target.value)}
+          onChange={handleBatteryChange}
+          error={errors.battery}
         />
 
         {/* Video Link */}
@@ -298,7 +315,8 @@ const Step2ProductDetails = () => {
           type="url"
           placeholder="https://youtube.com/..."
           value={listingFormData.video_link}
-          onChange={(e) => handleChange("video_link", e.target.value)}
+          onChange={handleVideoLinkChange}
+          error={errors.video_link}
         />
       </div>
     </div>

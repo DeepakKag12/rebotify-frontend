@@ -15,6 +15,7 @@ import {
   useUpdateDeliveryStatus,
 } from "../../../services/deliveryService";
 import DeliveryCard from "../components/DeliveryCard";
+import StatusUpdateModal from "../components/StatusUpdateModal";
 import { toast } from "react-toastify";
 
 const AllDeliveriesPage = () => {
@@ -26,6 +27,8 @@ const AllDeliveriesPage = () => {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState(statusFilter || "all");
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [pendingStatusUpdate, setPendingStatusUpdate] = useState(null);
 
   const deliveries = deliveriesData?.DeliveryData || [];
 
@@ -71,20 +74,25 @@ const AllDeliveriesPage = () => {
     return true;
   });
 
-  const handleStatusUpdate = (deliveryId, newStatus) => {
-    if (
-      window.confirm("Are you sure you want to update the delivery status?")
-    ) {
+  const handleStatusUpdate = (deliveryId, newStatus, currentStatus) => {
+    setPendingStatusUpdate({ deliveryId, newStatus, currentStatus });
+    setShowStatusModal(true);
+  };
+
+  const confirmStatusUpdate = () => {
+    if (pendingStatusUpdate) {
       updateStatus(
-        { deliveryId, status: newStatus },
+        { deliveryId: pendingStatusUpdate.deliveryId, status: pendingStatusUpdate.newStatus },
         {
           onSuccess: () => {
             toast.success("Delivery status updated successfully!");
+            setPendingStatusUpdate(null);
           },
           onError: (error) => {
             toast.error(
               error.response?.data?.message || "Failed to update status"
             );
+            setPendingStatusUpdate(null);
           },
         }
       );
@@ -126,7 +134,7 @@ const AllDeliveriesPage = () => {
                 placeholder="Search by tracking number, product, buyer, or seller..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900"
               />
             </div>
           </div>
@@ -218,6 +226,18 @@ const AllDeliveriesPage = () => {
           </motion.div>
         )}
       </div>
+
+      {/* Status Update Modal */}
+      <StatusUpdateModal
+        isOpen={showStatusModal}
+        onClose={() => {
+          setShowStatusModal(false);
+          setPendingStatusUpdate(null);
+        }}
+        onConfirm={confirmStatusUpdate}
+        currentStatus={pendingStatusUpdate?.currentStatus}
+        newStatus={pendingStatusUpdate?.newStatus}
+      />
     </div>
   );
 };

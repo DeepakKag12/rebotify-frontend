@@ -12,6 +12,8 @@ import {
   Filter,
   Loader2,
   Trash2,
+  CreditCard,
+  AlertCircle,
 } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "react-toastify";
@@ -98,7 +100,12 @@ const MyBidsPage = () => {
 
     if (listing.status === "closed") {
       if (bid.isWinning) {
-        return { label: "Won", color: "green", icon: Award };
+        // Check if payment is completed
+        const isPaid = listing.isPaid || bid.isPaid;
+        if (isPaid) {
+          return { label: "Won - Paid", color: "green", icon: Award, requiresPayment: false };
+        }
+        return { label: "Won - Payment Required", color: "green", icon: Award, requiresPayment: true };
       }
       return { label: "Lost", color: "red", icon: XCircle };
     }
@@ -348,6 +355,30 @@ const MyBidsPage = () => {
                           </button>
                         </div>
                       </div>
+
+                      {/* Payment Required Alert - Show for won bids that haven't paid */}
+                      {status.requiresPayment && listing.status === "closed" && bid.isWinning && !listing.isPaid && !bid.isPaid && (
+                        <div className="mt-4 p-4 bg-amber-50 border-l-4 border-amber-500 rounded-lg">
+                          <div className="flex items-start gap-3">
+                            <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-amber-900 mb-1">
+                                🎉 Congratulations! You Won This Bid
+                              </h4>
+                              <p className="text-sm text-amber-800 mb-3">
+                                Payment is required to complete the purchase. Click "View Details" to proceed with payment.
+                              </p>
+                              <button
+                                onClick={() => handleViewListing(listing)}
+                                className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition font-medium flex items-center gap-2 text-sm"
+                              >
+                                <CreditCard className="w-4 h-4" />
+                                Proceed to Payment
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </motion.div>

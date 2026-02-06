@@ -30,7 +30,7 @@ const Receipt = forwardRef(({ transaction, userRole }, ref) => {
               </div>
               <h1 className="text-3xl font-bold text-gray-900">Rebot</h1>
             </div>
-            <p className="text-sm text-gray-600">E-Waste Recycling Platform</p>
+            <p className="text-sm text-gray-600">Rebot - Recycling Platform</p>
           </div>
           <div className="text-right">
             <h2 className="text-2xl font-bold text-gray-900 mb-1">RECEIPT</h2>

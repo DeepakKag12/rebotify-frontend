@@ -23,10 +23,19 @@ import {
 const MyListingsPage = () => {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState("all");
   const limit = 10;
 
   const { data: listingsData, isLoading } = useGetSellerListings(page, limit);
   const { mutate: deleteListing, isPending: isDeleting } = useDeleteListing();
+
+  // Filter listings by status
+  const filteredListings =
+    statusFilter === "all"
+      ? listingsData?.listings || []
+      : listingsData?.listings?.filter(
+          (listing) => listing.status === statusFilter
+        ) || [];
 
   const navItems = [
     { label: "Dashboard", path: "/user/dashboard" },
@@ -96,14 +105,17 @@ const MyListingsPage = () => {
           </button>
         </div>
 
+        {/* Status Filter */}
+        <div className="mb-16 flex gap-3"></div>
+
         {/* Listings Grid */}
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
             <Loader2 className="w-8 h-8 text-brand-green animate-spin" />
           </div>
-        ) : listingsData?.listings?.length > 0 ? (
+        ) : filteredListings.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {listingsData.listings.map((listing, index) => (
+            {filteredListings.map((listing, index) => (
               <motion.div
                 key={listing._id}
                 initial={{ opacity: 0, y: 20 }}
@@ -149,7 +161,7 @@ const MyListingsPage = () => {
                     <div className="flex items-center gap-2 text-sm text-gray-600">
                       <DollarSign className="w-4 h-4 text-brand-green" />
                       <span className="font-semibold text-gray-900">
-                        ₹{listing.price?.toLocaleString()}
+                        ${listing.price?.toLocaleString()}
                       </span>
                       <span className="text-xs text-gray-500">
                         ({listing.price_type})

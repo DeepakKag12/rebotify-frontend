@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { FaLaptop, FaMobileAlt, FaTv, FaPrint, FaBatteryFull, FaEllipsisH } from 'react-icons/fa'
+import { BentoGrid, BentoGridItem } from '../../../components/ui/bento-grid'
 
 const Services = () => {
   const categories = [
@@ -7,76 +8,106 @@ const Services = () => {
       icon: FaLaptop,
       title: 'Computers & Laptops',
       description: 'Desktops, laptops, monitors',
+      image: '/images/laptop.webp',
     },
     {
       icon: FaMobileAlt,
       title: 'Mobile Phones & Tablets',
       description: 'Smartphones, tablets, accessories',
+      image: '/images/mobile.jpg',
     },
     {
       icon: FaTv,
       title: 'Home Appliances',
       description: 'TVs, refrigerators, microwaves',
+      image: '/images/homeappliances.jpg',
     },
     {
       icon: FaPrint,
       title: 'Office Equipment',
       description: 'Printers, scanners, copiers',
+      image: '/images/office.jpeg',
     },
     {
       icon: FaBatteryFull,
       title: 'Batteries & Cables',
       description: 'All types of batteries and wires',
-    },
-    {
-      icon: FaEllipsisH,
-      title: 'Others',
-      description: 'Gaming consoles, cameras, etc.',
+      image: '/images/batteries.jpeg',
     },
   ]
 
+  const ImageHeader = ({ image, title }) => (
+    <div className="flex flex-1 w-full h-36 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden items-center justify-center">
+      <img 
+        src={image} 
+        alt={title}
+        className="w-full h-full object-contain p-3"
+        onError={(e) => {
+          e.target.style.display = 'none';
+          e.target.parentElement.className = 'flex flex-1 w-full h-36 rounded-xl bg-gradient-to-br from-brand-light to-brand-green/20';
+        }}
+      />
+    </div>
+  );
+
   return (
-    <section id="services" className="py-20 bg-white">
+    <section id="services" className="py-16 md:py-20 bg-gradient-to-b from-white to-brand-light/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-brand-olive mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-brand-olive mb-3">
             What We Accept
           </h2>
-          <p className="text-xl text-brand-gray-medium max-w-2xl mx-auto">
+          <p className="text-lg text-brand-gray-medium max-w-2xl mx-auto">
             We handle all types of electronic waste responsibly
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-6 lg:gap-8">
-          {categories.map((category, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              whileHover={{ scale: 1.05 }}
-              className="bg-gradient-to-br from-brand-light to-white rounded-2xl p-6 lg:p-8 shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer border-2 border-transparent hover:border-brand-green"
-            >
-              <div className="flex flex-col items-center text-center">
-                <div className="bg-brand-green rounded-full w-20 h-20 flex items-center justify-center mb-4 shadow-lg">
-                  <category.icon className="text-3xl text-white" />
-                </div>
-                <h3 className="text-lg font-bold text-brand-black mb-2">
-                  {category.title}
-                </h3>
-                <p className="text-sm text-brand-gray-medium">
-                  {category.description}
-                </p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          <BentoGrid className="max-w-7xl mx-auto">
+            {categories.slice(0, 3).map((item, i) => (
+              <BentoGridItem
+                key={i}
+                title={item.title}
+                description={item.description}
+                header={<ImageHeader image={item.image} title={item.title} />}
+                icon={
+                  <div className="bg-brand-green rounded-full w-10 h-10 flex items-center justify-center mb-2">
+                    <item.icon className="text-xl text-white" />
+                  </div>
+                }
+                className=""
+              />
+            ))}
+          </BentoGrid>
+          
+          {/* Second row - centered */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto mt-6">
+            {categories.slice(3, 5).map((item, i) => (
+              <BentoGridItem
+                key={i + 3}
+                title={item.title}
+                description={item.description}
+                header={<ImageHeader image={item.image} title={item.title} />}
+                icon={
+                  <div className="bg-brand-green rounded-full w-10 h-10 flex items-center justify-center mb-2">
+                    <item.icon className="text-xl text-white" />
+                  </div>
+                }
+                className=""
+              />
+            ))}
+          </div>
+        </motion.div>
 
         {/* CTA */}
         <motion.div

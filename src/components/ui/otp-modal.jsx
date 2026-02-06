@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Mail, Clock, Loader2 } from "lucide-react";
+import { X, Mail, Clock, Loader2, AlertTriangle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "./button";
 import OTPInput from "./otp-input";
@@ -174,9 +174,9 @@ const OTPModal = ({
                   logging in again.
                 </p>
                 {timeLeft > 0 && (
-                  <p className="text-xs text-amber-600 font-medium">
-                    ⚠️ This window will stay open until OTP expires or is
-                    verified
+                  <p className="text-xs text-amber-600 font-medium flex items-center gap-1">
+                    <AlertTriangle className="w-3 h-3" />
+                    This window will stay open until OTP expires or is verified
                   </p>
                 )}
               </div>

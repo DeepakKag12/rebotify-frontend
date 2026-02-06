@@ -69,7 +69,7 @@ const Statistics = () => {
   ]
 
   return (
-    <section className="py-20 bg-gradient-to-br from-brand-green via-brand-olive to-brand-green relative overflow-hidden">
+    <section className="py-16 md:py-20 bg-gradient-to-br from-brand-green via-brand-olive to-brand-green relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full blur-3xl"></div>

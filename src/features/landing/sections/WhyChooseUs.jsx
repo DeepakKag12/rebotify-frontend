@@ -30,18 +30,18 @@ const WhyChooseUs = () => {
   ]
 
   return (
-    <section id="about-us" className="py-20 bg-gradient-to-br from-brand-light to-white">
+    <section id="about-us" className="py-16 md:py-20 bg-gradient-to-br from-brand-light/40 to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-brand-olive mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-brand-olive mb-3">
             Why Choose Us
           </h2>
-          <p className="text-xl text-brand-gray-medium max-w-2xl mx-auto">
+          <p className="text-lg text-brand-gray-medium max-w-2xl mx-auto">
             The smartest way to handle your electronic waste responsibly
           </p>
         </motion.div>

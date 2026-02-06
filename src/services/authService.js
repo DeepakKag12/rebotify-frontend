@@ -2,6 +2,7 @@ import axiosInstance from "../lib/axios";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient } from "../lib/queryClient";
 import useAuthStore from "../store/authStore";
+import { useNavigate } from "react-router-dom";
 
 // API Calls
 export const authAPI = {
@@ -12,11 +13,6 @@ export const authAPI = {
 
   login: async (credentials) => {
     const { data } = await axiosInstance.post("/users/login", credentials);
-    return data;
-  },
-
-  loginWithOTP: async (credentials) => {
-    const { data } = await axiosInstance.post("/users/login-with-otp", credentials);
     return data;
   },
 
@@ -65,22 +61,8 @@ export const useSignup = () => {
 };
 
 export const useLogin = () => {
-  const setAuth = useAuthStore((state) => state.setAuth);
-
   return useMutation({
     mutationFn: authAPI.login,
-    onSuccess: (data) => {
-      // Direct login - set auth immediately
-      if (data.user && data.token) {
-        setAuth(data.user, data.token);
-      }
-    },
-  });
-};
-
-export const useLoginWithOTP = () => {
-  return useMutation({
-    mutationFn: authAPI.loginWithOTP,
     onSuccess: (data) => {
       // Login returns OTP requirement, not immediate auth
       // Actual auth happens in verifyOTP
@@ -102,12 +84,14 @@ export const useVerifyOTP = () => {
 
 export const useLogout = () => {
   const logout = useAuthStore((state) => state.logout);
+  const navigate = useNavigate();
 
   return useMutation({
     mutationFn: authAPI.logout,
     onSuccess: () => {
       logout();
       queryClient.clear();
+      navigate("/", { replace: true });
     },
   });
 };

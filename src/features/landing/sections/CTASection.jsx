@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa";
+import { CheckCircle } from "lucide-react";
 import useAuthStore from "../../../store/authStore";
 
 const CTASection = () => {
@@ -35,7 +36,7 @@ const CTASection = () => {
   };
 
   return (
-    <section className="py-20 bg-gradient-to-r from-brand-green to-brand-olive relative overflow-hidden">
+    <section className="py-16 md:py-20 bg-gradient-to-r from-brand-green to-brand-olive relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 opacity-10">
         <motion.div
@@ -71,11 +72,11 @@ const CTASection = () => {
           viewport={{ once: true }}
           className="space-y-8"
         >
-          <h2 className="text-4xl md:text-6xl font-bold text-white leading-tight">
+          <h2 className="text-4xl md:text-5xl font-bold text-white leading-tight">
             Ready to Make a Difference?
           </h2>
 
-          <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto">
             Join thousands of users contributing to a cleaner, greener planet.
             Start your e-waste recycling journey today!
           </p>
@@ -85,7 +86,7 @@ const CTASection = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleCreateListing}
-              className="px-10 py-5 bg-white text-brand-green rounded-lg hover:bg-brand-light transition-all duration-300 font-bold text-lg shadow-2xl flex items-center gap-3 group"
+              className="px-8 py-4 bg-white text-brand-green rounded-lg hover:bg-brand-light transition-all duration-300 font-bold text-base shadow-2xl flex items-center gap-3 group"
             >
               {isAuthenticated
                 ? "Go to Dashboard"
@@ -97,16 +98,21 @@ const CTASection = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleLearnMore}
-              className="px-10 py-5 border-3 border-white text-white rounded-lg hover:bg-white hover:text-brand-green transition-all duration-300 font-bold text-lg"
+              className="px-8 py-4 border-2 border-white text-white rounded-lg hover:bg-white hover:text-brand-green transition-all duration-300 font-bold text-base"
             >
               Learn More
             </motion.button>
           </div>
 
           <div className="pt-8 text-white/80">
-            <p className="text-sm">
-              ✓ Free listing • ✓ Certified recyclers • ✓ Quick pickup • ✓
-              Real-time tracking
+            <p className="text-sm flex items-center gap-3 flex-wrap justify-center">
+              <span className="flex items-center gap-1"><CheckCircle className="w-4 h-4" /> Free listing</span>
+              <span>•</span>
+              <span className="flex items-center gap-1"><CheckCircle className="w-4 h-4" /> Certified recyclers</span>
+              <span>•</span>
+              <span className="flex items-center gap-1"><CheckCircle className="w-4 h-4" /> Quick pickup</span>
+              <span>•</span>
+              <span className="flex items-center gap-1"><CheckCircle className="w-4 h-4" /> Real-time tracking</span>
             </p>
           </div>
         </motion.div>

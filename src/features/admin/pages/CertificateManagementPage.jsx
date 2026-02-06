@@ -8,6 +8,8 @@ import useAdminStore from "../../../store/adminStore";
 import { Card } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
 import DashboardNavbar from "../../../shared/components/DashboardNavbar";
+import CertificateStatusModal from "../components/CertificateStatusModal";
+import { toast } from "react-toastify";
 
 const CertificateManagementPage = () => {
   const {
@@ -20,11 +22,14 @@ const CertificateManagementPage = () => {
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedCertificate, setSelectedCertificate] = useState(null);
   const [activeTab, setActiveTab] = useState("pending");
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [pendingStatusUpdate, setPendingStatusUpdate] = useState(null);
 
   const navItems = [
     { label: "Dashboard", path: "/admin/dashboard" },
     { label: "Users", path: "/admin/users" },
     { label: "Certificates", path: "/admin/certificates" },
+    { label: "Profile", path: "/admin/profile" },
   ];
 
   const { data, isLoading, error } = useAllCertificates(
@@ -45,21 +50,35 @@ const CertificateManagementPage = () => {
     setViewModalOpen(true);
   };
 
-  const handleStatusUpdate = async (certificateId, status) => {
-    if (!confirm(`Are you sure you want to ${status} this certificate?`)) {
-      return;
-    }
+  const handleStatusUpdate = (certificateId, status) => {
+    setPendingStatusUpdate({ 
+      certificateId, 
+      status, 
+      currentStatus: selectedCertificate?.status || "pending",
+      certificateName: selectedCertificate?.certificate_name 
+    });
+    setShowStatusModal(true);
+  };
+
+  const confirmStatusUpdate = async () => {
+    if (!pendingStatusUpdate) return;
+
+    // Close the modal first
+    setShowStatusModal(false);
 
     try {
       await updateStatusMutation.mutateAsync({
-        certificateId,
-        status,
+        certificateId: pendingStatusUpdate.certificateId,
+        status: pendingStatusUpdate.status,
       });
+      toast.success(`Certificate ${pendingStatusUpdate.status} successfully!`);
       setViewModalOpen(false);
       setSelectedCertificate(null);
+      setPendingStatusUpdate(null);
     } catch (error) {
       console.error("Failed to update certificate:", error);
-      alert(error.response?.data?.message || "Failed to update certificate");
+      toast.error(error.response?.data?.message || "Failed to update certificate");
+      setPendingStatusUpdate(null);
     }
   };
 
@@ -422,7 +441,7 @@ const CertificateManagementPage = () => {
                   </label>
                   {selectedCertificate.uploadDocument ? (
                     <a
-                      href={`${import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || "http://localhost:3005"}/${
+                      href={`${"http://localhost:3005"}/${
                         selectedCertificate.uploadDocument
                       }`}
                       target="_blank"
@@ -481,6 +500,19 @@ const CertificateManagementPage = () => {
           </div>
         </div>
       )}
+
+      {/* Certificate Status Update Modal */}
+      <CertificateStatusModal
+        isOpen={showStatusModal}
+        onClose={() => {
+          setShowStatusModal(false);
+          setPendingStatusUpdate(null);
+        }}
+        onConfirm={confirmStatusUpdate}
+        currentStatus={pendingStatusUpdate?.currentStatus}
+        newStatus={pendingStatusUpdate?.status}
+        certificateName={pendingStatusUpdate?.certificateName}
+      />
     </div>
   );
 };

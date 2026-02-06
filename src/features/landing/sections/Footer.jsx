@@ -151,10 +151,10 @@ const Footer = () => {
               <li className="flex items-start">
                 <FaEnvelope className="mt-1 mr-3 text-brand-green-light" />
                 <a
-                  href="mailto:info@ewastehub.com"
+                  href="mailto:info@rebot.com"
                   className="text-white/80 hover:text-brand-green-light transition-colors"
                 >
-                  info@ewastehub.com
+                  info@rebot.com
                 </a>
               </li>
               <li className="flex items-start">
@@ -218,7 +218,7 @@ const Footer = () => {
         {/* Copyright */}
         <div className="border-t border-white/20 pt-8 text-center text-white/60 text-sm">
           <p>
-            © {new Date().getFullYear()} E-WasteHub. All rights reserved.
+            © {new Date().getFullYear()} Rebot. All rights reserved.
             <span className="mx-2">|</span>
             Made with <span className="text-brand-green-light">♥</span> for the
             Planet

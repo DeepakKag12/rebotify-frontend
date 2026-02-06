@@ -16,16 +16,21 @@ import {
   Users,
   Award,
   XCircle,
+  CreditCard,
+  CheckCircle,
 } from "lucide-react";
 import { getImageUrl } from "../../../lib/axios";
 import {
   useGetBidsForListing,
   useWithdrawBid,
+  useGetBidStatus,
+  useBuyerAcceptDeal,
 } from "../../../services/bidService";
 import { format } from "date-fns";
 import BidFormModal from "./BidFormModal";
 import useAuthStore from "../../../store/authStore";
 import { toast } from "react-toastify";
+import { PaymentButton } from "../../../components/ui/payment-button";
 
 const ListingDetailModal = ({ listing, onClose }) => {
   const { user } = useAuthStore();
@@ -39,8 +44,18 @@ const ListingDetailModal = ({ listing, onClose }) => {
     refetch: refetchBids,
   } = useGetBidsForListing(listing._id);
 
+  // Fetch bid status for payment workflow
+  const {
+    data: bidStatus,
+    isLoading: statusLoading,
+    refetch: refetchStatus,
+  } = useGetBidStatus(listing._id);
+
   // Withdraw bid mutation
   const { mutate: withdrawBid, isPending: isWithdrawing } = useWithdrawBid();
+
+  // Buyer accept deal mutation
+  const { mutate: acceptDeal, isPending: isAccepting } = useBuyerAcceptDeal();
 
   const images = listing.image_paths || [];
   const hasMultipleImages = images.length > 1;
@@ -81,6 +96,36 @@ const ListingDetailModal = ({ listing, onClose }) => {
       );
     }
   };
+
+  // Handle accept deal (buyer confirms they want to proceed)
+  const handleAcceptDeal = () => {
+    acceptDeal(listing._id, {
+      onSuccess: () => {
+        toast.success("Deal accepted! Proceed with payment.");
+        refetchStatus();
+        refetchBids();
+      },
+      onError: (error) => {
+        const errorMessage =
+          error.response?.data?.message || "Failed to accept deal";
+        toast.error(errorMessage);
+      },
+    });
+  };
+
+  // Handle payment success
+  const handlePaymentSuccess = (response) => {
+    toast.success("Payment successful! Invoices have been sent to both parties via email.");
+    refetchStatus();
+    refetchBids();
+    onClose();
+  };
+
+  // Check if user is the winning bidder and can pay
+  const isWinningBidder = bidStatus?.canPay || false;
+  const awaitingPayment = bidStatus?.awaitingPayment || false;
+  const isPaid = bidStatus?.isPaid || false;
+  const buyerAccepted = bidStatus?.buyerAccepted || false;
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % images.length);
@@ -410,57 +455,90 @@ const ListingDetailModal = ({ listing, onClose }) => {
               )}
 
               {/* Action Buttons */}
-              <div className="flex gap-4">
+              <div className="flex gap-4 flex-wrap">
                 <button
                   onClick={onClose}
-                  className="flex-1 px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+                  className="flex-1 min-w-[120px] px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
                 >
                   Close
                 </button>
                 {!isOwnListing && !hasUserBid && listing.status === "open" && (
                   <button
                     onClick={() => setShowBidForm(true)}
-                    className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold flex items-center justify-center gap-2"
+                    className="flex-1 min-w-[120px] px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold flex items-center justify-center gap-2"
                   >
                     <DollarSign className="w-5 h-5" />
                     Place Bid
                   </button>
                 )}
-                {!isOwnListing && hasUserBid && listing.status === "open" && (
+                {!isOwnListing && hasUserBid && listing.status === "open" && !isWinningBidder && (
                   <>
                     <button
                       onClick={handleWithdrawBid}
                       disabled={isWithdrawing}
-                      className="flex-1 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex-1 min-w-[120px] px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <XCircle className="w-5 h-5" />
                       {isWithdrawing ? "Withdrawing..." : "Withdraw Bid"}
                     </button>
                     <button
                       onClick={() => setShowBidForm(true)}
-                      className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold flex items-center justify-center gap-2"
+                      className="flex-1 min-w-[120px] px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold flex items-center justify-center gap-2"
                     >
                       <DollarSign className="w-5 h-5" />
                       Update Bid
                     </button>
                   </>
                 )}
-                {!isOwnListing && listing.status === "closed" && (
-                  <div className="flex-1 px-6 py-3 bg-gray-100 text-gray-600 rounded-lg text-center font-medium">
-                    {hasUserBid &&
-                    userBid?.amount ===
-                      Math.max(...allBids.map((b) => b.amount)) ? (
-                      <span className="text-green-600 font-semibold flex items-center justify-center gap-2">
+                
+                {/* Payment Section for Winning Bidder */}
+                {!isOwnListing && (awaitingPayment || isWinningBidder || listing.status === "closed") && (
+                  <>
+                    {isPaid ? (
+                      <div className="flex-1 min-w-[200px] px-6 py-3 bg-green-100 text-green-700 rounded-lg text-center font-semibold flex items-center justify-center gap-2">
+                        <CheckCircle className="w-5 h-5" />
+                        Payment Completed
+                        {bidStatus?.invoiceNumber && (
+                          <span className="text-sm font-normal ml-2">
+                            Invoice: {bidStatus.invoiceNumber}
+                          </span>
+                        )}
+                      </div>
+                    ) : isWinningBidder ? (
+                      <div className="flex-1 min-w-[200px]">
+                        {!buyerAccepted ? (
+                          <button
+                            onClick={handleAcceptDeal}
+                            disabled={isAccepting}
+                            className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold flex items-center justify-center gap-2 disabled:opacity-50"
+                          >
+                            {isAccepting ? "Accepting..." : "Accept Deal & Proceed to Payment"}
+                          </button>
+                        ) : (
+                          <PaymentButton
+                            listingId={listing._id}
+                            amount={bidStatus?.highestBid || bidsData?.highestBid}
+                            productName={`${listing.brand} ${listing.model}`}
+                            onSuccess={handlePaymentSuccess}
+                          />
+                        )}
+                      </div>
+                    ) : hasUserBid &&
+                      userBid?.amount ===
+                        Math.max(...allBids.map((b) => b.amount)) ? (
+                      <div className="flex-1 min-w-[200px] px-6 py-3 bg-yellow-100 text-yellow-800 rounded-lg text-center font-medium flex items-center justify-center gap-2">
                         <Award className="w-5 h-5" />
-                        You Won This Bid!
-                      </span>
+                        You Won! Awaiting seller confirmation...
+                      </div>
                     ) : (
-                      "Listing Closed"
+                      <div className="flex-1 min-w-[200px] px-6 py-3 bg-gray-100 text-gray-600 rounded-lg text-center font-medium">
+                        Listing Closed
+                      </div>
                     )}
-                  </div>
+                  </>
                 )}
                 {isOwnListing && (
-                  <div className="flex-1 px-6 py-3 bg-gray-100 text-gray-500 rounded-lg text-center font-medium">
+                  <div className="flex-1 min-w-[200px] px-6 py-3 bg-gray-100 text-gray-500 rounded-lg text-center font-medium">
                     Your Listing
                   </div>
                 )}

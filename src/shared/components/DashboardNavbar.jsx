@@ -15,36 +15,27 @@ const DashboardNavbar = ({ navItems = [] }) => {
     logout(undefined, {
       onSuccess: () => {
         toast.success("Logged out successfully");
-        window.location.href = "/login";
+        window.location.href = "/";
       },
     });
   };
 
   // Get profile path based on user role
   const getProfilePath = () => {
-    console.log("🔍 User UserType:", user?.userType);
-
-    // Check both role and userType fields
     const userRole = user?.userType;
-    console.log("🔍 Final Role:", userRole);
 
     if (userRole === "user") {
-      console.log("✅ Redirecting to /user/profile");
       return "/user/profile";
     }
     if (userRole === "recycler") {
-      console.log("✅ Redirecting to /recycler/profile");
       return "/recycler/profile";
     }
     if (userRole === "delivery" || userRole === "delivery_partner") {
-      console.log("✅ Redirecting to /delivery-partner/profile");
       return "/delivery-partner/dashboard";
     }
     if (userRole === "admin") {
-      console.log("✅ Redirecting to /admin/profile");
       return "/admin/profile";
     }
-    console.log("❌ No matching role, redirecting to /profile");
     return "/profile";
   };
 
