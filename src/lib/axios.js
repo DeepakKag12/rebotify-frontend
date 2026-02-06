@@ -38,6 +38,13 @@ axiosInstance.interceptors.response.use(
 // Helper function to get full image URL
 export const getImageUrl = (imagePath) => {
   if (!imagePath) return null;
+  
+  // If it's already a full URL (Cloudinary or any external URL), return as-is
+  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+    return imagePath;
+  }
+  
+  // For old local paths (legacy support - these may not work if files don't exist)
   // Use env variable base URL, strip /api suffix for image paths
   const apiBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:3005/api";
   const baseURL = apiBase.replace(/\/api$/, "");
